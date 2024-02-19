@@ -14,6 +14,9 @@ fn greet2(name: String) -> String:
     return "Hello, " + name + "!"
 
 
+# ========== Variables =========
+
+
 # Mojo doesn't support top-level code yet. So every program must include a func named main() as an entry point
 fn main():
     print("Hello, world!")

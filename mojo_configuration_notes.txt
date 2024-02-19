@@ -1,0 +1,5 @@
+When installing mojo on wsl ubuntu, I found to set the environment variables for mojo to be most convenient like so:
+- sudo nano ~/.profile
+- add the following lines to the bottom of the file:
+    export MODULAR_HOME="$HOME/.modular"
+    export PATH="$MODULAR_HOME/pkg/packages.modular.com_mojo/bin:$PATH"
