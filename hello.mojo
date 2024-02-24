@@ -57,6 +57,36 @@ fn use_mypair():
     mine.dump()
 
 
+# ========== Traits ==========
+# Trait is like a template of characteristics for a Struct
+# When you use traits, all characteristics of a struct must be from a trait??
+# Each characteristic of a trait is a requirement for the struct, aka conform to it
+# Currently only method signatures are allowed to be traits, with no default behaviours
+
+# Allows generic functions that can accept any type that conforms to a trait
+trait SomeTrait:
+    fn required_method(self, x:Int): ...
+
+
+# Struct conforming to the trait
+struct SomeStruct(SomeTrait):
+    fn __init__(inout self):
+        pass
+
+    fn required_method(self, x: Int):
+        print("Hello traits", x)
+
+
+# A func that uses the trait as an argument type (instead of the struct type)
+fn fun_with_traits[T: SomeTrait](x: T):
+    x.required_method(42)
+
+
+fn use_trait_function():
+    var thing = SomeStruct()
+    fun_with_traits(thing)
+
+
 # Mojo doesn't support top-level code yet. So every program must include a func named main() as an entry point
 fn main():
     print("Hello, world!")
@@ -72,3 +102,6 @@ fn main():
         print("Could not execute add_one")
 
     use_mypair()    # Why doesn't it require try/except??
+
+    # Use traits call
+    use_trait_function()    
