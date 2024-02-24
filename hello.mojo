@@ -32,6 +32,31 @@ def add_one(x):
     print(x + y)
 
 
+# ========== Structs ==========
+# Can build high-level abstrations for types (or objects) as a struct
+# Struct is similar to a Python class
+# But Mojo structs are completely static (bound at compile time, so no monkey patching, dynamic dispatch, orother runtime changes to the structure)
+# Mojo will support Python style classes in the future
+
+# Basic struct:
+struct MyPair:
+    var first: Int
+    var second: Int
+
+    fn __init__(inout self, first: Int, second: Int):
+        self.first = first
+        self.second = second
+
+    fn dump(self):
+        print(self.first, self.second)
+
+
+# Use MyPAir
+fn use_mypair():
+    let mine = MyPair(2, 4)
+    mine.dump()
+
+
 # Mojo doesn't support top-level code yet. So every program must include a func named main() as an entry point
 fn main():
     print("Hello, world!")
@@ -45,3 +70,5 @@ fn main():
         _ = add_one(3)
     except:
         print("Could not execute add_one")
+
+    use_mypair()    # Why doesn't it require try/except??
