@@ -105,6 +105,27 @@ fn call_repeat():
 # Compiler generates a unique version of repeat, repeating 3 times
 # The same principle goes for Structs
 
+# ========== Blocks and Statements ==========
+# Blocks are signified with a colon and indentation like so:
+
+def loop():                 # Scope 1
+    for x in range(5):      # Scope 2
+        if x % 2 == 0:      # Scope 3
+            print(x)
+
+# All code statements in Mojo end with a newline. 
+# But statements can span several lines if you indent the following lines
+def print_line():
+    long_text = "This is a long line of text that is a lot easier to read if" 
+                "it is broken up across two lines instead of one long line"
+    print(long_text)
+
+# Chain function calls across lines
+def print_hello():
+    text = String(",")
+            .join("Hello", " world")
+    print(text)
+
 
 # Mojo doesn't support top-level code yet. So every program must include a func named main() as an entry point
 fn main():
@@ -127,3 +148,13 @@ fn main():
 
     # Call parameterized function (some compiler overhead)
     call_repeat()    
+
+    # Blocks and statemenst
+    try:
+        _ = loop()
+        _ = print_line()
+        _ = print_hello()
+    except:
+        print("Could not execute loop...")
+
+        
