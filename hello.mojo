@@ -78,13 +78,32 @@ struct SomeStruct(SomeTrait):
 
 
 # A func that uses the trait as an argument type (instead of the struct type)
-fn fun_with_traits[T: SomeTrait](x: T):
+fn fun_with_traits[T: SomeTrait](x: T):     # Generic function, accepts any Struct that implements the trait SomeTrait
     x.required_method(42)
 
 
 fn use_trait_function():
     var thing = SomeStruct()
     fun_with_traits(thing)
+
+
+# ========== Parameterization ==========
+# In Mojo, a parameter is a compile-time variable that becomes a runtime constant.
+# Declared in square brackets on a func or struct
+# Allow compile-time metaprogramming (like a template), generating or modifying code at compile-time
+
+fn repeat[count: Int](msg: String):
+    for i in range(count):
+        print(msg)
+
+
+# To call this func, specify both parameter (count) and argument (msg)
+fn call_repeat():
+    repeat[3]("Hello")
+
+# Count is guaranteed to not change at runtime, so the compiler can optimize for this
+# Compiler generates a unique version of repeat, repeating 3 times
+# The same principle goes for Structs
 
 
 # Mojo doesn't support top-level code yet. So every program must include a func named main() as an entry point
@@ -104,4 +123,7 @@ fn main():
     use_mypair()    # Why doesn't it require try/except??
 
     # Use traits call
-    use_trait_function()    
+    use_trait_function()
+
+    # Call parameterized function (some compiler overhead)
+    call_repeat()    
