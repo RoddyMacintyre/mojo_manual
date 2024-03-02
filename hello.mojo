@@ -141,6 +141,18 @@ var message = "Hello, world!"   # This is also a comment!
 Also used for docstrings!
 """
 
+# ========== Python integration ==========
+# Mojo is not yet a full superset of Python, but can import Python modules as-is.
+# Need to have numpy installed: pip install numpy
+
+from python import Python
+
+fn use_numpy() raises:
+    var np = Python.import_module("numpy")
+    var ar = np.arange(15).reshape(3, 5)
+    print(ar)
+    print(ar.shape)
+
 
 # Mojo doesn't support top-level code yet. So every program must include a func named main() as an entry point
 fn main():
@@ -171,5 +183,11 @@ fn main():
         _ = print_hello()
     except:
         print("Could not execute loop...")
+
+    # Python integration
+    try:
+        _ = use_numpy()
+    except:
+        print("Could not execute Numpy Python function...")
 
         
