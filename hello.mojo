@@ -126,6 +126,21 @@ def print_hello():
             .join("Hello", " world")
     print(text)
 
+# ========== Code comments ==========
+# One line comments and multi-line comments:
+# This is a comment
+"""
+This is also a commnet
+That can span over multiple
+Lines!
+"""
+
+var message = "Hello, world!"   # This is also a comment!
+
+"""
+Also used for docstrings!
+"""
+
 
 # Mojo doesn't support top-level code yet. So every program must include a func named main() as an entry point
 fn main():
