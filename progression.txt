@@ -1,2 +1,2 @@
-https://docs.modular.com/mojo/manual/basics.html
-# Section parameterization
+https://docs.modular.com/mojo/manual/functions
+# Section The object type
