@@ -49,6 +49,12 @@ fn _greet(name: String) -> String:
 fn pow(base: Int, exp: Int = 2) -> Int:
     return base ** exp
 
+# ========== KEYWORD ARGUMENTS ==========
+# Can pass them in any order (obviously)
+fn use_keywords():
+    var z = pow(exp=3, base=2)
+    print(z)
+
 def main():
     greeting = greet("Roddy")
     print(greeting)
