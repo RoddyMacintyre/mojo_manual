@@ -55,6 +55,40 @@ fn use_keywords():
     var z = pow(exp=3, base=2)
     print(z)
 
+# ========== VARIADIC ARGUMENTS ==========
+"""
+Lets function accept a variable number of arguments.
+Variadic syntax: *argument_name
+It accepts any number of passed positional arguments.
+Can define 0 or more args before the variadic arg. 
+Any remaining positional args will be assigned to the variadic arg
+Any args after it have to be keyword args.
+
+NO VARIADIC KWARGS YET! ALSO NO MULTITYPE VARIADIC ARGS.
+
+Print does support mixed type variadics, but requires working with undocumented MLIR APIs
+
+Variadic args are projected to iterable lists. 
+Some differences in handling between register-passable types (e.g. Int -> VariadicList) 
+and memory-only types (String -> VariadicListMem (refs instead of values, need to dereference with []))
+"""
+fn sum(*values: Int) -> Int:
+    var sum: Int = 0
+    # Account for all the Ints in the variadic arg
+    for value in values:
+        sum = sum + value
+    return sum
+
+fn make_worldly(inout *strs: String):
+    # Need [] to dereference
+    for i in strs:
+        i[] += " world"
+
+fn _make_worldly(inout *strs: String):
+    # Works as expected in Py
+    for i in range(len(strs)):
+        strs[i] += " world"
+
 def main():
     greeting = greet("Roddy")
     print(greeting)
