@@ -18,6 +18,31 @@ def greet(name: String) -> String:
     var greeting = "Hello, " + name + "!"
     return greeting
 
+# ========== THE OBJECT TYPE ==========
+"""
+If you don;t declare the type of an argument or return value in a def func, it becomes an object.
+The object type allows for dynamic typing, as it can represent any type in mojo.
+Very much Python like, but can create runtime errors upon unexpected types.
+
+Object values are passed using object referencing semantics, 
+and is not compatible with argument conventions that enforce value semantics
+"""
+
+# ========== FN FUNCTIONS ==========
+"""
+Provides strict type checking and additional memory safety. Below function looks the same, but fn is more strict:
+- Args must specify a type
+- Return values must specify a type (except void, defaults to None)
+- Args default received as immutable references (read-only, borrowed arg convention)
+- Variables must be declared using the var keyword
+- If a function raises an exception, must be explicitly declared with the raises keyword
+
+All this prevents runtime errors, and promotes performance because of compile time fixing of types
+"""
+fn _greet(name: String) -> String:
+    var greeting = "Hello" + name + "!"
+    return greeting
+
 
 def main():
     greeting = greet("Roddy")
