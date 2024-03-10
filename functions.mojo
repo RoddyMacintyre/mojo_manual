@@ -43,6 +43,11 @@ fn _greet(name: String) -> String:
     var greeting = "Hello" + name + "!"
     return greeting
 
+# ========== OPTIONAL ARGUMENTS ==========
+# Argument that includes a default value
+# CANNOT DEFINE A DEFAULT FOR AN ARG THAT'S DECLARED AS INOUT!
+fn pow(base: Int, exp: Int = 2) -> Int:
+    return base ** exp
 
 def main():
     greeting = greet("Roddy")
