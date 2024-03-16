@@ -50,3 +50,20 @@ var name2 = String("Sam")
 
 Both create a string from a StringLiteral type
 """
+
+# ========== Late Initialization ==========
+"""
+Type annotations allow for late initialization; declare with type but no concrete value.
+e.g.
+
+fn my_function(x: Int):
+    var z: Float32
+    if x != 0:
+        z = 1.0
+    else:
+        z = foo()
+    print(z)
+
+fn foo() -> Float32:
+    return 3.14
+"""
