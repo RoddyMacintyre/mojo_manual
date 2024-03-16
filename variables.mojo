@@ -67,3 +67,27 @@ fn my_function(x: Int):
 fn foo() -> Float32:
     return 3.14
 """
+
+# ========== Implicit Type Conversion ==========
+"""
+Some types include built-in type conversion. e.g. number to a string:
+var number: String = 1  <- Produces "1"
+
+Value assignment can be converted to a constructor call if the target type supports this
+In this case code uses the following String constructor:
+
+__init__(inout self, num: Int)
+
+Implicit conversion follows the logic of overloaded funcs, because it's exactly the same mechanism.
+
+"""
+
+fn take_string(version: String):
+    print(version)
+
+fn pass_integer():
+    var version: Int = 1
+    take_string(version)
+
+fn main() -> None:
+    pass_integer()
