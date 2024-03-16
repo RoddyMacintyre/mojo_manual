@@ -89,6 +89,40 @@ fn _make_worldly(inout *strs: String):
     for i in range(len(strs)):
         strs[i] += " world"
 
+# ========== POSITIONAL-ONLY & KEYWORD-ONLY ARGS ==========
+"""
+Restrict args to positional only, or keyword only
+
+Positional-only:
+To define them, add a / to the argument list. Arguments before the / are positonal only, and cannot be passed as keyword
+
+for example:
+fn min(a: Int, b: Int, /) -> Int:
+    return a if a < b else b
+
+Reasons for  positional-only:
+- arg names are not meaningful
+- Freedom to change arg names later on without breaking code
+
+Keyword-only
+Inverse of positonal-only, can only be specified by a keyword. 
+If func accepts variadic args, everything after the variadics are keyword-only
+keyword-only args often have a default, but is not required. If it hasn;t got a default, it's a required keyword-only arg
+
+for example:
+fn sort(*values: Float64, ascending: Bool = True)
+
+Or without variadic args, can signify keyword-only with a *
+
+fn kw_only_args(a1: Int, a2: Int, *, double: Bool) -> Int:
+    var product = a1 * a2
+    if double:
+        return product * 2
+    else:
+        return product
+
+"""
+
 def main():
     greeting = greet("Roddy")
     print(greeting)
