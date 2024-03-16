@@ -35,3 +35,18 @@ nane = "Sammy"  # This is not allowed in an fn func
 
 Can use var in a def func, but the benifits stated above drop.
 """
+
+# ========== Type Annotations ==========
+"""
+Mojo supports dynamic and static type annotations on variables, enabling strong compile-time checking.
+Makes code more predictable, manageable, and secure
+
+var name: String = "Sam"    # name now must always be a String or anything implicitly convertable to a String
+Must use var for type annotations
+
+If a type has a constructor with 1 arg, can initialize in 2 ways:
+var name1: String = "Sam"
+var name2 = String("Sam")
+
+Both create a string from a StringLiteral type
+"""
