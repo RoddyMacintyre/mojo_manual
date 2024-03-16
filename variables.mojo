@@ -89,5 +89,44 @@ fn pass_integer():
     var version: Int = 1
     take_string(version)
 
+# ========== Variable Scopes ==========
+"""
+Variables declared with var are bound by lexical scoping, 
+meaning nested blocks can read/modify such vars from the outer scope,
+but outer scope cannot read those defined in inner scope.
+"""
+
+def lexical_scopes():
+    var num = 10
+    var dig = 1
+
+    if True:
+        print("num:", num)
+        var num = 20    # Variable shadowing
+        print("num:", num)
+        dig = 2     # Variable shadowing
+    print("num:", num)
+    print("dig:", dig)
+
+"""
+Undeclare vars use function-level scoping (Python like behavior)
+This means that the inner scope holds a reference to the variable and changes it
+effecting the outer scope as well.
+"""
+
+def functional_scopes():
+    num = 1
+    if num ==1:
+        print(num)
+        num = 2
+        print(num)
+    print(num)
+    
 fn main() -> None:
     pass_integer()
+
+    try:
+        _ = lexical_scopes()
+        _ = functional_scopes()
+    except:
+        print("Could not call...")
