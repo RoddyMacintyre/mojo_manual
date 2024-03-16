@@ -123,6 +123,47 @@ fn kw_only_args(a1: Int, a2: Int, *, double: Bool) -> Int:
 
 """
 
+# ========== Overloaded functions ==========
+"""
+If a def func doens't specify types, then any datatype can be passed, and mojo will try to resolve it.
+This is nice for expressive API's, because overloads are often not needed 
+
+All fn funcs must specify arg types, so to make those funcs work with different types, need overloaded sets/templates/concepts or something alike
+Wrong passed types give a compiler error, unless can implicitely cast (e.g. StringLiteral -> String)
+
+Mojo finds the best match or signals ambiguity, in which case you can explicitly cast values to a supported arg type.
+Overloading works in combos of fn and def funcs (e.g. a bunch on fn types, accompanied by some def ones as a fallback that don;t specify all types)
+
+"""
+
+# Overlaod example
+fn add(x: Int, y: Int) -> Int:
+    return x + y
+
+fn add(x: String, y: String) -> String:
+    return x + y
+
+# Ambiguous overloading
+@value
+struct MyString:
+    fn __init__(inout self, string: StringLiteral):
+        pass
+
+fn foo(name: String):
+    print("String")
+
+fn foo(name: MyString):
+    print("MyString")
+
+# This one is chosen
+fn call_foo():
+    var string = "Hello"
+    foo(MyString(string))
+
+
+
 def main():
     greeting = greet("Roddy")
     print(greeting)
+
+    call_foo()
