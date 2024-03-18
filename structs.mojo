@@ -52,6 +52,21 @@ struct MyPairMethods:
         # Self is referenced to get the Struct's fields out.
         return self.first + self.second
 
+# ========== Static Methods ==========
+"""
+Static method can be called without creating an instance. 
+It doesn't receive the implicit self arg, and can therefore not access instance fields
+Can call the static method solely with the type, but also on an instance of the type
+"""
+struct Logger:
+    fn __init__(inout self):
+        pass
+    
+    @staticmethod
+    fn log_info(message: String):
+        print("Info: ", message)
+
+
 fn main():
     # Instantiating a struct:
     var mine = MyPairInit(2, 4)
@@ -59,3 +74,10 @@ fn main():
 
     var mine2 = MyPairMethods(6, 8)
     print(mine2.get_sum())
+
+    # Call static method from the type
+    Logger.log_info("Static method called")
+
+    # Call static method from the instance
+    var l = Logger()
+    l.log_info("Static method called from instance")
