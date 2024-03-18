@@ -37,7 +37,25 @@ struct MyPairInit:
         self.first = first
         self.second = second
 
+# ========== Methods ==========
+# can add methods freely, aside from dunder methods.
+# Methods referencing self are called instance methods because they act on an instance of a struct
+struct MyPairMethods:
+    var first: Int
+    var second: Int
+
+    fn __init__(inout self, first: Int, second: Int):
+        self.first = first
+        self.second = second
+
+    fn get_sum(self) -> Int:
+        # Self is referenced to get the Struct's fields out.
+        return self.first + self.second
+
 fn main():
     # Instantiating a struct:
     var mine = MyPairInit(2, 4)
     print(mine.first)
+
+    var mine2 = MyPairMethods(6, 8)
+    print(mine2.get_sum())
