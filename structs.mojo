@@ -90,6 +90,20 @@ Dunder/special methods for operator overflow (much like Python)
 All Mojo's standard types are made using structs
 """
 
+# ========== Special Methods ==========
+"""
+Dunder methods (double underscore) are predetermined methods that can be defined for a Struct
+Best practise to not use them explicitly; Mojo invokes them automagically when needed
+e.g. __init__() for instance creation, __del__() as a destructor
+
+Operator behavior is also defined in this way (like +, <, ==, |, etc.)
+Almost all special methods match the Python special methods and handle 2 types of tasks:
+    - Operator overloading
+    - Lifecycle event handling (including ownerships)
+
+Can synthesize boilerplate methods essential for lifecycle handling by adding the @value decorator
+"""
+
 
 fn main():
     # Instantiating a struct:
