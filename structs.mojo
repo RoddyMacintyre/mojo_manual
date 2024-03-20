@@ -104,6 +104,43 @@ Almost all special methods match the Python special methods and handle 2 types o
 Can synthesize boilerplate methods essential for lifecycle handling by adding the @value decorator
 """
 
+# ========== @value Decorator ==========
+"""
+When adding the @value decorator, Mojo will synthesize essential lifecycle methods, to provide an object with full value semantics
+Then following are specifically synthesized:
+    - __init__()
+    - __copyinit__()
+    - __moveinit__()
+
+These are the Construct, Copy, and Move semantic compatible with Mojo's ownership model
+"""
+
+@value
+struct MYPEt:
+    var name: String
+    var age: Int
+
+# Mojo will synthesize the above behind the scenes as if you had written the following:
+struct _MyPet:
+    var name: String
+    var age: Int
+
+    fn __init__(inout self, owned name: String, age: Int):
+        self.name = name
+        self.age = age
+
+    fn __copyinit__(inout self, existing: Self):
+        self.name = existing.name
+        self.age = existing.age
+
+    fn __moveinit__(inout self, owned existing: Self):
+        self.name = existing.name^  # What's this carat symbol for?
+        self.age = existing.age
+
+# Without a copy construcor, could not assign an instance to a new variable by means of a copy.
+# Custom implementations of the above synthesized methods will override the default synthesized ones
+# "Owned" signifies unique ownership of the value
+
 
 fn main():
     # Instantiating a struct:
@@ -119,3 +156,6 @@ fn main():
     # Call static method from the instance
     var l = Logger()
     l.log_info("Static method called from instance")
+
+    var pet_cat = _MyPet(name="Kingston", age=15)
+    var copycat = pet_cat   # Copy (__copyinit__)
