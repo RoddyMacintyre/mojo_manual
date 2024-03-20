@@ -67,6 +67,30 @@ struct Logger:
         print("Info: ", message)
 
 
+# ========== Structs Compared to Classes ==========
+"""
+Mojo Structs vs Python classes
+
+Both support:
+    - methods
+    - fields
+    - operator overloading
+    - decorators for metaprogramming
+    - etc.
+
+Key differences:
+    - Python classes are dynamic (dynamic dispatch, monkey patching, binding instance fields at runtime)
+    - Mojo structs are static (bound at compile time; flexibility vs. performance)
+    - Mojo structs do not dupport inheritence, but can implement Traits
+    - Python supports class attrs (values shared by all instances)
+    - Mojo structs don't support static data members
+
+All fields must be explicitly declared with var
+Dunder/special methods for operator overflow (much like Python)
+All Mojo's standard types are made using structs
+"""
+
+
 fn main():
     # Instantiating a struct:
     var mine = MyPairInit(2, 4)
