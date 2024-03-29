@@ -30,3 +30,20 @@ If you want the source code in a different location than main.mojo, compile it t
 Package command:
 `mojo package mypackage -o mypack.mojopkg`
 """
+
+# ========== The __init__ File ==========
+"""
+__init__.mojo is required for packages, but can be empty like Python
+
+The code written in __init__.mojo will not be executed like in Python
+top-level code is not yet supported for this.
+You can add Structs and functions though, which can be imported with the package name.
+
+Can add APIs of module members by importing them in __init__.mojo.
+That way, you can import them directly from the package name instead of a deeper namespace like mypackage.mymodule.
+
+Choices for this are also made in the Standard Library, and the behavior can vary depending onthe implementation. Consider below:
+"""
+from algorithm.functional import map 
+from algorithm import map 
+# Both are valid
