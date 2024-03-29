@@ -109,7 +109,7 @@ def lexical_scopes():
     print("dig:", dig)
 
 """
-Undeclare vars use function-level scoping (Python like behavior)
+Undeclared vars use function-level scoping (Python like behavior)
 This means that the inner scope holds a reference to the variable and changes it
 effecting the outer scope as well.
 """
