@@ -44,6 +44,6 @@ That way, you can import them directly from the package name instead of a deeper
 
 Choices for this are also made in the Standard Library, and the behavior can vary depending onthe implementation. Consider below:
 """
-from algorithm.functional import map 
+# from algorithm.functional import map 
 from algorithm import map 
 # Both are valid

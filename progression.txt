@@ -1,2 +1,1 @@
-https://docs.modular.com/mojo/manual/structs
-# Section "Structs compared to Classes"
+https://docs.modular.com/mojo/manual/values/
