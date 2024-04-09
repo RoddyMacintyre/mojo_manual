@@ -102,3 +102,5 @@ print(t)            # Tensor([[1, 2]], dtype=uint8, shape=2)
 
 # In the above func, in Python it would print 1, 3 in both cases
 """
+
+# ========== Value Semantics in def VS fn ==========
