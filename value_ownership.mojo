@@ -48,3 +48,57 @@ By following these rules, Mojo can automatically (de)allocate heap memory.
 
 To achieve this goal, there are some new syntax elements and rules.
 """
+
+# ========== VALUE SEMANTICS ==========
+"""
+Mojo doesn;t enfore value semantics or reference semantics, but does support them both.
+Each type can define how it is created, copied, moved, and destroyed.
+Mojo is designed with arg behaviors that default to value semantics, and has tight control over ref semantics to avoid mem errors
+
+Value Ownership Model
+Provides the controls over reference semantics. Value semantics menas that each var has unique access to a val
+and any code outside its scope cannot modify its value
+"""
+
+# ========== Intor to Value Semantics ==========
+"""
+Sharing a value-semantic type means that you create a copy of the value (aka "pass by value")
+e.g.
+
+x = 1   # 1, and stays one
+y = x   # 1, x is copied as a value
+y += 1  # 2
+
+Value semantics example with a function:
+def add_one(y: Int):    # y value is copied, and x is not modified.
+    y += 1
+    print(y)    # Prints 2
+
+x = 1
+add_one(x)
+print(x)        # Prints 1
+
+
+In reference Semantics, y would point to the same value as x, in effect incrementing one value referenced by 2 variables.
+Neither x nor y owns the value, and any var can ref and mutate the value.
+
+Python is not value semantic even though it behaves the same as above. 
+Imagine calling a Python function, and pass it an object with a pointer to a heap-allocated value.
+Python gives the function a reference to that object, making the function able to mutate the heap-allocated value.
+
+In Mojo, the default is value semantics for all func args. If a func wants to do mutations, it must be explicit about it.
+All Mojo types passed to a def are passed by value, except the function has true ownership of the value (usually a copy).
+
+Example passing an object from the heap:
+def update_tensor(t: Tensor[Dtype.uint8]):
+    t[1] = 3
+    print(t)        # Tensor([[1, 3]], dtype=uint8, shape=2)
+
+t = Tensor[DType.uint8](2)
+t[0] = 1
+t[1] = 2
+update_tensor(t)
+print(t)            # Tensor([[1, 2]], dtype=uint8, shape=2)
+
+# In the above func, in Python it would print 1, 3 in both cases
+"""
