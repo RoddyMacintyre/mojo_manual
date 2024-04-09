@@ -104,3 +104,29 @@ print(t)            # Tensor([[1, 2]], dtype=uint8, shape=2)
 """
 
 # ========== Value Semantics in def VS fn ==========
+"""
+Def funcs get ownersip of args by default.
+Fn funcs receive args as immutable references by default (mem optimization to avoid copies).
+
+e.g.
+fn add_two(y: Int):
+    # Make an explicit copy, to get ownership of y
+    var z = y
+    z += 2
+    print(z)    # Prints 3
+
+x = 1
+add_two(x)
+print(x)        # Prints 1
+
+Each var maintains unique ownership of its value. The fn func receives a value in a "look but don't touch" manner.
+So, both def and fn are fully value semantic; args are either copies or immutable references.
+
+BUT: For memory efficient programs, reference semantics are basically required. 
+This has to be implemented in a way that does not disturb the value semantics' predictability and safety.
+To achieve this in Mojo, every value is ensured to have an "exclusive owner", and not that every var has "exclusive access".
+And also Mojo destroys each value when the lifetime of its owner has ended.
+
+"""
+
+# 
