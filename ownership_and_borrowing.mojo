@@ -15,3 +15,42 @@ When the lifetime ends, Mojo destroys the value.
 Below are the rules that govern this ownership model and how to specify arg conventions 
 that define how values are shared into functions
 """
+
+# ========== Argument Conventions ==========
+"""
+Code quality and perf depends a lot on how functions treat argument values.
+Is it received as a unique value or a reference, and is it mutable or immutable?
+
+Mojo attempts to provide full value semantics by default (provides consistend and predictable behavior)
+Also need full control over memory optimizations, which require reference semantics.
+
+To safely apply reference semantics, lifetime of every value is tracked, and destroyed at the right time
+Achieved by every value having only one owner.
+
+Arg convention specifies whether an argument is mutable or immutable, and whether the func owns the value.
+Each convention is defined by a keyword at the beginning of an argument declaration.
+
+- borrowed
+    Immutable reference (Read-only)
+- inout
+    Mutable reference (Read-Write - NOT a copy)
+- owned
+    function takes ownership (exclusive mutable access). Caller loses acces to the value.
+    Caller should transfer ownership to the function (not always what happens, and might instead be a copy)
+
+E.g.
+Below function has one mutable reference andone immutable reference.
+
+Sometimes arguments are not declared because every argument has a default convention
+depending on if the function is fn or def
+    - def: owned by default
+    - fn: borrowed by default
+"""
+fn add(inout x: Int, borrowed y: Int):
+    x += y
+
+fn main():
+    var a = 1
+    var b = 2
+    add(a, b)
+    print(a)
