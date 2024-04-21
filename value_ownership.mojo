@@ -130,3 +130,35 @@ And also Mojo destroys each value when the lifetime of its owner has ended.
 """
 
 # ========== Python-style Reference Semantics ==========
+"""
+NOTE: Following only applies to def functions without type declarations
+
+Mojo doesn't enforce value semantics or reference semantics. 
+To provide Python compatibility, Mojo's object type is designed to support Python style
+of argument passing to funcs/meths. This is different from Mojo's other types.
+
+Python arg passing is by reference. You pass the reference to an object, as a value.
+In effect the arg is an alias to the original object. However, if you modify the arg, you modify the original
+
+def modify_list(l):
+    l.append(3)
+    print("func:", 1)
+
+ar = [1, 2]
+modify_list(ar)
+print("orig:", ar)
+
+If the python func instead assigns a value to l, the original object is not affected.
+So, Python can mutate the original value, or assign a completely new object to the argument
+"""
+
+# ========== Pass by Object Reference in Mojo ==========
+"""
+Pass by object reference for def functions for all dynamic types will come to Mojo soon with the object type.
+Meaning you can have dynamic typing and "pass by object reference" behavior by writing it like Python:
+- Use def declarations
+- Don't declare argument types
+
+NOTE: Mojo is not yet a complete superset of Python.
+DOCUMENTATION WILL FOLLOW
+"""
