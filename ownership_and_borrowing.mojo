@@ -54,3 +54,25 @@ fn main():
     var b = 2
     add(a, b)
     print(a)
+
+
+# ========== Ownership Summary ==========
+"""
+Fundamental rules for ownership:
+
+- Every value has one owner at a time
+- when the lifetime of the owner ends, the value is destroyed
+
+Borrow checker:
+Process in the Mojo compiler ensuring unique ownerships for values, 
+and also enforces the following memory-dafety rules:
+
+- Cannot create multiple mutable references (inout) for the same value (multi borrows are ok)
+FLAG!
+- cannot create a mutable reference (inout) if there exists an immutable reference (borrowed)
+    for the same value !!!NOT CURRENTLY IMPLEMENTED!!!
+
+Mojo disallows mutable references overlapping with another mutable or immutable reference.
+When the lifetime has ended, references become invalid.
+Because of this, Mojo can immediately destroy a value when the lifetime ends.
+"""
