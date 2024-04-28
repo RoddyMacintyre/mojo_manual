@@ -85,7 +85,20 @@ def print_shape(borrowed tensor: Tensor[DType.float32]):
     shape = tensor.shape()
     print(shape.__str__())
 
-    
+
+# ========== Compared to C++ & Rust ==========
+"""
+Mojo's borrowed is similar to C++ const&, which also avoids a copy and disables mutability in the callee.
+It does also differ in 2 important ways:
+    - Mojo compiler implements a borrow checker, preventing code from dynamically formin mutable references to a value
+        when there are immutable references outstanding, and prevents multiple mutable references to the same value
+    - Small values like Int, Float, SIMD, etc are passed directly to machine registers instead of through an extra indirection (@register_passable)
+        A significant perf enhancer compared to Rust & C++, and moves the optimization from every call site to a declaration on the type definition
+
+Similar to Rust, Mojo's borrow checker enforces exclusivity of invariants. Mojo doesn;t require a sigil on the caller side to pass by borrow.
+Mojo is more efficient when passing small values, and Rust defaults to moving vals and not passing them around by borrow. This provides for an easier programming model.
+"""
+
 
 fn main():
     var a = 1
