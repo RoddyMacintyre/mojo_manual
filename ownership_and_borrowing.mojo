@@ -100,6 +100,28 @@ Mojo is more efficient when passing small values, and Rust defaults to moving va
 """
 
 
+# ========== Mutable Arguments (inout) ==========
+"""
+For mutable references add the inout keyword.
+It literally means it goes in, and changes go out.
+It's the default in def funcs...
+
+!Using inout is more memory efficient because it does not make a copy of the value!
+
+A value passed into inout must already be mutable. A borrowed value will not be able to be passed as an arg.
+You will get a compiler error in that case.
+
+!Cannot define defaults for inout!
+"""
+def mutate(inout y: Int):
+    y += 1
+
+# It's equivalent to the following:
+def mutate_copy(y: Int) -> Int:
+    y += 1
+    return y
+
+
 fn main():
     var a = 1
     var b = 2
@@ -112,3 +134,14 @@ fn main():
         _ = print_shape(tensor)
     except:
         print("Cannot execute print_shape")
+
+    # Mutable arguments
+    var x = 1
+    var y = 1
+    try:
+        _ = mutate(x)
+        print(x)
+        y = mutate_copy(y)
+        print(y)
+    except:
+        print("Cannot execute mutate(_copy)")
