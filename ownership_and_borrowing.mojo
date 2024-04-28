@@ -49,12 +49,6 @@ depending on if the function is fn or def
 fn add(inout x: Int, borrowed y: Int):
     x += y
 
-fn main():
-    var a = 1
-    var b = 2
-    add(a, b)
-    print(a)
-
 
 # ========== Ownership Summary ==========
 """
@@ -76,3 +70,32 @@ Mojo disallows mutable references overlapping with another mutable or immutable 
 When the lifetime has ended, references become invalid.
 Because of this, Mojo can immediately destroy a value when the lifetime ends.
 """
+
+
+# ========== Immutable Arguments ==========
+"""
+For an immutable reference, add borrowed keyword.
+It's the default for all args in an fn func, but can still explicitly specify it.
+Also works with def funcs, but it's not the default.
+"""
+
+from tensor import Tensor, TensorShape
+
+def print_shape(borrowed tensor: Tensor[DType.float32]):
+    shape = tensor.shape()
+    print(shape.__str__())
+
+    
+
+fn main():
+    var a = 1
+    var b = 2
+    add(a, b)
+    print(a)
+
+    # Immutable arguments
+    try:
+        var tensor = Tensor[DType.float32](256, 256)
+        _ = print_shape(tensor)
+    except:
+        print("Cannot execute print_shape")
