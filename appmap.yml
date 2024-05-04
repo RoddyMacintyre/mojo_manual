@@ -1,4 +1,0 @@
-appmap_dir: tmp/appmap
-language: python
-name: mojo_manual
-packages: []
