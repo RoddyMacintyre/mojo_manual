@@ -154,6 +154,20 @@ fn my_function_transfer():
     take_text(message^)
 
 
+# ========== Transfer Implementation Details ==========
+"""
+Ownership transfer and move operation are not strictly the same things. 
+
+Multiple ways Mojo tranfers ownership of a value without making a copy:
+    - If type is movable (__moveinit__()), Mojo may invoke this method IF a value of that type is 
+        transferred into a function as an OWNED argument, AND the original value's lifetime ends at that same point
+        (with or without using the ^ operator)
+    - If a type hasn't implemented __moveinit__(), Mojo may transfer ownership by simply passing the recipient
+        a ref to the val in the caller's stack
+
+For the OWNED to work without the transfer operator ^, the value type must be COPYABLE (__copyinit__())
+"""
+
 
 fn main():
     var a = 1
