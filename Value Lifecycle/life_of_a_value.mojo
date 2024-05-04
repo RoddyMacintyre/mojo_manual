@@ -166,6 +166,50 @@ struct Target:
 var t = Target(source=a)
 """
 
+# ========== Copy Constructor ==========
+"""
+Mojo tries to make a copy of the right side value when it encounters the assingment operator
+by calling the type's copy constructor (__copyinit).
+It's the responsibility of the author to implement this copy constructor.
+
+e.g. the MyPet type does not have a copy constructor, so the following code will fail:
+var mine = MyPet2("Kingy")
+var yours = mine    # Requires a copy, but MyPet2 doesn' implement it.
+
+To make this work, implement the copy sconstructor __copyinit__() method
+
+NOTE:
+In the copy constructor the 2nd self (for existing) is capitalized. This is merely a convention to distinguish
+between the mandatory inout self arg and the copy constructor arg.
+
+NOTE:
+The existing arg in __copyinit__ is immutable because the default arg convention in an fn function is BORROWED.
+This is a good convention because the function should not modify the contents of the value being copied.
+"""
+
+struct MyPet3:
+    var name: String
+    var age: Int
+
+    fn __init__(inout self, name: String, age: Int):
+        self.name = name
+        self.age = age
+
+    fn __copyinit__(inout self, existing: Self):    # Note how the 2nd self is capitalized to Self
+        self.name = existing.name
+        self.age = existing.age
+
+"""
+Contrary to most other languages, Mojo's copy behaviour performs a deep copy of all fields in the type (as per VALUE SEMANTICS).
+It copies heap-allocated values rather than copying the pointer.
+
+The Mojo Compiler doesn't enforce this, so it's the responsibility of the author to implement __copyinit__()
+with VALUE SEMANTICS.
+e.g. a HeapArray type that perfomrs a deep copy in the copy constructor:
+"""
+
+struct HeapArray:
+    
 
 fn main():
     NoInstances.print_hello()
@@ -176,3 +220,7 @@ fn main():
     # Constrtuctor overloading
     var mine1 = MyPet1()
     var mine2 = MyPet1("Kingy")
+
+    # Copy Constructor
+    var mine3 = MyPet3("Kingy", 15)
+    var yours = mine3
