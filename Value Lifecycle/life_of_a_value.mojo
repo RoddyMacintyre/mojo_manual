@@ -71,6 +71,32 @@ struct MyPet1:
         self.name = name
 
 
+# ========== Field Initialization ==========
+"""
+By the end of each constructor, all fields must be initialized (the only requirement).
+
+__init__ is smart enough to treat the self object as fully initialized before the constructor is finished,
+so long all fields are initialized.
+
+Below the constructor can pass around self as soon as all fields are initialized.
+"""
+fn use(arg: MyPet2):
+    pass
+
+
+struct MyPet2:
+    var name: String
+    var age: Int
+
+    fn __init__(inout self, name: String, age: Int, cond: Bool):
+        self.name = name
+        if cond:
+            self.age = age
+            use(self)   # self can be used from this point!
+
+        self.age = age
+        use(self)   # self can be used from this point!
+
 
 fn main():
     NoInstances.print_hello()
