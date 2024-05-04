@@ -24,5 +24,30 @@ struct NoInstances:
         print("Hello world!")
 
 
+# ========== Constructor ==========
+"""
+To create instances in Mojo, you need to implement the __init__ method.
+Its main responsibility is to iitalize fields (see MyPet)
+
+MyPet can be borrowed, but as of now cannot be copied or moved. This is a good starting point,
+and it's up to the author to decide whether to implement lifecycle methods, and how they should behave.
+
+NOTE: 
+Mojo doens;t require a desturctor to destroy an object. As long as all fields are destructible,
+Mojo knows how to destroy the type when the lifetime ends.
+"""
+
+struct MyPet:
+    var name: String
+    var age: Int
+
+    fn __init__(inout self, name: String, age: Int):
+        self.name = name
+        self.age = age
+
+
 fn main():
     NoInstances.print_hello()
+
+    # Constructor
+    var mine = MyPet("Loke", 4)
