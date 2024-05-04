@@ -122,6 +122,39 @@ def mutate_copy(y: Int) -> Int:
     return y
 
 
+# ========== Transfer Arguments (owned and ^) ==========
+"""
+Owned keyword: function can receive value ownership
+Usually combined with the ^ (transfer) operator, which ends the lifetime of that variable outside of the function
+
+Technically, owned kw doesn't guarantee that the received value is a mutable reference to the oiriginal value.
+It guarantees that the fn gets unique ownership of the particular value (value semantics). 
+This unique ownership happens in 2 ways:
+    - Caller passes arg with ^ operator, ehich ends lifetime of the variable, and ownership is transferred to the func,
+        without making a copy of any heap-allocated data
+    - Caller does not use ^. Original variable stays valid and the value is copied into the func arg.
+
+Regardless "owned" args have unique mutable access to the value.
+
+Following code makes a copy of a string, because the caller of the func doesn't include the ^ operator
+"""
+fn take_text(owned text: String):
+    text += "!"
+    print(text)
+
+fn my_function():
+    var message: String = "Hello"
+    take_text(message)
+    print(message)
+
+# If you add the ^ transfer operator when calling take_text, you cannot print message again, 
+# because the ownership is transferred, and the message variabel becomes invalid.
+fn my_function_transfer():
+    var message: String = "Hello"
+    take_text(message^)
+
+
+
 fn main():
     var a = 1
     var b = 2
@@ -145,3 +178,8 @@ fn main():
         print(y)
     except:
         print("Cannot execute mutate(_copy)")
+
+    # Transfer args calls. My function makes a copy of the arg from take text, because no ^ operator is used.
+    my_function()
+    # Here, the transfer is used, and cannot use original message var after transferring it to take_text
+    my_function_transfer()
