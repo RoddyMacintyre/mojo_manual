@@ -168,6 +168,29 @@ Multiple ways Mojo tranfers ownership of a value without making a copy:
 For the OWNED to work without the transfer operator ^, the value type must be COPYABLE (__copyinit__())
 """
 
+# ========== Def vs Fn argument conventions ==========
+"""
+def and fn are interchangeable as far as the caller is concerned, and both can accomplish the same.
+Insid ethey differ, and def is essentially a "sugared" fn version.
+
+    - A def arg without type annotation defaults to the object type (fn must be explicitly typed)
+    - A def arg without a convention kw (borrowed, inout, owned) defaults to owned (receives a copy with a mutable var)
+
+"""
+# Below 2 functions behave the same:
+def example(borrowed a: Int, inout b: Int, c):
+    pass
+
+fn example_fn(a: Int, inout b: Int, owned c: object):
+    pass
+
+# for example_fn, you could leave out specifying owned, in favor of copying the var inside the func when you need it!
+fn example_fn_no_owned(a: Int, inout b: Int, c_in: object):
+    var c = c_in
+    # References for small objects are cheap to copy. 
+    # The expensive part is adjusting reference counts, but that's eliminated by compiler optimization.
+    pass
+
 
 fn main():
     var a = 1
