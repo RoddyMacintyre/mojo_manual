@@ -22,3 +22,22 @@ The lifecycle methods and how to implement them in accordance with Mojo's VALUE 
 """
 
 # ========== Lifecycles and Lifetimes ==========
+"""
+LIFECYCLE:
+    - Defined by various dunder methods in a struct. Each lifecycle event is handled by a method, such as the constructor (__init__),
+        destructor (__del__), copy constructor (__copyinit__), and move constructor (__moveinit__). 
+        This also means that all values from one type share a common lifecycle.
+
+LIFETIME:
+    - Span of "time" during program execution in which a value is considered valid. It begins at initialization,
+        and ends at destruction (generally from __init__ to __del__).
+        No 2 values have the same lifetime, because creation and destruction always occurs at different points in time/execution.
+
+Life begins at initialization until destruction. Mojo destroys a value/object as soon as it's no longer used.
+This is called the "ASAP" destruction policy that runs after every sub-expression.
+
+It's hard to track value lifetimes if the value is shared many times across functions/routines. 
+Mojo makes it more predictable, partly through VALUE SEMANTICS and VALUE OWNERSHIP.
+Alongside these 2 concepts, the VALUE LIFECYCLE completes the lifetime management puzzle;
+every value must implement key lifecycle methods that define creation and destruction.
+"""
