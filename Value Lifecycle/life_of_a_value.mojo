@@ -46,8 +46,38 @@ struct MyPet:
         self.age = age
 
 
+# ========== Constructor Overloading ==========
+"""
+You can overload any method, including the __init__. You might want a default constructor
+that sets some default values and takes no args, plus one that does accept args for extra values/
+
+Be aware that to modify fields, the __init__ must declare self with the INOUT convention.
+You can also call one constructor from the other.
+
+Below an example of constructor overloading.
+
+"""
+
+struct MyPet1:
+    var name: String
+    var age: Int
+
+    fn __init__(inout self):
+        self.name = ""
+        self.age = 0
+
+    fn __init__(inout self, name: String):
+        self = MyPet1()
+        self.name = name
+
+
+
 fn main():
     NoInstances.print_hello()
 
     # Constructor
     var mine = MyPet("Loke", 4)
+
+    # Constrtuctor overloading
+    var mine1 = MyPet1()
+    var mine2 = MyPet1("Kingy")
