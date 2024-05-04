@@ -98,6 +98,75 @@ struct MyPet2:
         use(self)   # self can be used from this point!
 
 
+# ========== Constructors and Implicit Conversion ==========
+"""
+Mojo supports implicit conversion of types. Implicit conversion can happen when:
+    - A value of one type is assigned to a var with a different type
+    - Passing a value of one type as an arg to a func that requires a differen type.
+
+In both cases, implicit conversion is supported when the target type defines a constructor with one single, required, non-keyword argument of the source type.
+var a = Source()
+var b: Target = a
+
+The matching constructor in Target could look like the following:
+struct Target:
+    fn __init__(inout self, s: Source):
+        ...
+
+The implicit conversion makes the assignment equivalent to the following:
+var b = Target(a)
+
+Implicit conversion constructor can also take optional args, so long it's a keyword argument
+struct Target:
+    def __init__(inout self, s: Source, reverse: Bool = False):
+        ...
+
+Implicit conversion also occurs if the type doesn;t declare its own constructor, 
+but rather uses the @value decorator, AND the type has only one field.
+Mojo creates a member-wise constructor for each field (remember that all types are Structs!),
+and when there is only one field, that constructor works like a conversion constructor.
+
+The following type can also convert Source to Target:
+@value
+struct Target:
+    var s: Source
+
+Implicit conversion can fail if Mojo cannot unambiguously match the conversion to a constructor.
+e.g. if the Target type has 2 overloaded constructors that take different types, and each of those types
+supports an implicit conversion from the Source type, the compiler cannot figure out which one to use .
+
+struct A:
+    fn __init__(inout self, s: Source): 
+        ...
+
+struct B:
+    fn __init__(inout self, s: Source):
+        ...
+
+struct Target:
+    fn __init__(inout self, a: A):
+        ...
+    
+    fn __init__(inout self, b: B):
+        ...
+
+Both target inits accept a Source type, so removing either of them will help the compiler along.
+
+***
+If you want to define a single-arg constructor, but don;t want the types to implicitly convert,
+you can define the constructor with a keyword-only argument!
+***
+
+struct Target:
+    # Does not support implicit conversion
+    fn __init__(inout self, *, source: Source):
+        ...
+
+# Constructor must be called with a keyword arg
+var t = Target(source=a)
+"""
+
+
 fn main():
     NoInstances.print_hello()
 
