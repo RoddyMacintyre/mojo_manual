@@ -384,6 +384,86 @@ Copying simple types on the stack (Ints, Flaots, Booleans) is very cheap.
 But, if you allow copying, there's no reason to disallow moves, so you can use @value to synthesize both constructors.
 """
 
+# ========== Simple Value Types ==========
+"""
+Copy and Move constructors are optional, and provide for good usecases (like atomics), yet most structs
+are simple aggregations of other types that should be copyable and movable.
+
+Since otherwise you would need to write a lot of boilerplate for all these types,
+Mojo has the @value decorator to synthesize __init__(), __copyinit__(), and __moveinit__().
+
+Consider the following:
+"""
+
+@value
+struct MyPet5:
+    var name: String
+    var age: Int
+
+
+
+# Mojo detects the @value, and when it doesn't see an __init__(), copy, or move, it will synthesize them.
+# It's equivalent to the following:
+
+struct MyPet6:
+    var name: String
+    var age: Int
+
+    fn __init__(inout self, name: String, age: Int):
+        self.name = name
+        self.age = age
+
+    fn __copyinit__(inout self, existing: Self):
+        self.name = existing.name
+        self.age = existing.age
+
+    fn __moveinit__(inout self, owned existing: Self):
+        self.name = existing.name^
+        self.age = existing.age
+
+
+"""
+Mojo synthesizes each lifecycle method when it doesn't exist. MEaning, you can use @value, and still define
+overrides to the default synthesized ones.
+It's common to use default member-wise and move constructors, but implement a custom copy constructor.
+
+A common pattern is using @value for a default constructor, and then overriding this constructor for different arg sets.
+
+Below MyPet without having to specify the age:
+"""
+
+@value
+struct MyPet7:
+    var name: String
+    var age: Int
+
+    fn __init__(inout self, owned name: String):
+        self.name = name^
+        self.age = 0
+
+"""
+This struct doewsn't override the default constructor because it doesn't share the same arg set.
+
+The __init__ takes the args as OWNED, because the constructor must take ownership of each value to store it.
+This enables the use of move-only types, and is therefore an optimization technique.
+Small types are also passed as OWNED, however often OWNEd means nothing in that context, so we don't need to 
+use the owned convention and ^ operator.
+
+Mojo compiler will see that name^ in self.name is the last place of usage, so essentially, the ^ operator is redundant there.
+It will make it a move instead of a copy and delete.
+
+NOTE:
+If a type contains any move-only fields, Mojo will not synthesize the copy constructor, because those fields cannot be copied.
+
+@value will not work if any of the members are not copyable and not movable. e.g. if you have an Atomic in the struct,
+then you don't have a "true" value type, and don't want move and copy anyway.
+
+MyPet above doesn't implement __del__, because Mojo doens't need it to destroy the values (see Death of a value)
+"""
+
+
+
+
 fn main():
     NoInstances.print_hello()
 
