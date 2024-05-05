@@ -285,6 +285,105 @@ Mojo also calls the copy constructor when a value is passed as OWNED, AND when t
 If the lifetime of the value does end there (e.g. by declaring it transferred with the ^ operator), Mojo will invoke the MOVE constructor
 """
 
+# ========== Move Constructor ==========
+"""
+Copying values provides predictable behavior, matching Mojo's VALUE SEMANTICS. But, copying some data types
+can be a heavy operation. 
+With REFERENCE SEMANTICS, instead of making a copy when passing a value, you share the value as a reference.
+If the original value is no longer needed, the original is nulled to avoid DOUBLE-FREE or USE-AFTER-FREE errors.
+
+This is typically knowns as a MOVE OPERATION:
+    - The memory block holding the data remains the same, but the pointer to that block moves to a new variable.
+
+To support moves, implement the __moveinit__() method. This method performs a consuming move.
+This means that ownership is transferred from one variable to another when the original variable's lifetime ends
+(also known as a "destructive move")
+
+NOTE:
+Move constructor is not required to transfer ownership of a value. Unlike in Rust, ownership transfers are not always moves.
+Move constructors are only part of the implementation of Mojo ownership transfers (see the section ownership transfer)
+
+Upon a move, Mojo invalidates the original var immediately. This prevents any access to it, and disables its constructor.
+Invalidating the original variable is needed to avoid memory errors (USE-AFTER-FREE & DOUBLE-FREE) on heap-allocated data.
+
+Below is a move constructor for the HeapArray
+"""
+
+struct HeapArray2:
+    var data: Pointer[Int]
+    var size: Int
+    
+    fn __init__(inout self, size: Int, val: Int):
+        self.size = size
+        self.data = Pointer[Int].alloc(self.size)
+
+        for i in range(self.size):
+            self.data.store(i, val)
+
+    fn __copyinit__(inout self, existing: Self):
+        # Deep-cpopy of the existing value
+        self.size = existing.size
+        self.data = Pointer[Int].alloc(self.size)
+
+        for i in range(self.size):
+            self.data.store(i, existing.data.load(i))   # LOAD instead of STORE
+
+    fn __moveinit__(inout self, owned existing: Self):  # OWNED
+        print("move")
+        # Shallow copy the existing value
+        self.size = existing.size
+        self.data = existing.data
+        # Lifetime of existing ends here, but Mojo DOESN't call the destructor
+    
+    fn __del__(owned self):
+        # Must free the Heap-allocated data, but Mojo knows how to destroy the other fields
+        self.data.free()
+
+    fn dump(self):
+        # Print the array
+        print("[", end="")
+        for i in range(self.size):
+            if i > 0:
+                print(", ", end="")
+            print(self.data.load(i), end="")
+        print("]")
+
+"""
+The critical feature is that it takes the incoming value as OWNED, so it gets unique ownership of the value.
+Becasue this is a dunder method that Mojo only calls during a move (ownership transfer), the existing arg 
+is guaranteed to be a mutable reference to the original value, and not a copy (unlike other methods declaring OWNED, but
+might end up receiving the value as a copy if the ^ operator is not involved).
+Meaning, Mojo calls this move constructor only when the lifetime of the original variable actually ends at the point of transfer.
+
+Below examples of using the move constructor on the HeapArray
+"""
+
+fn moves():
+    var a = HeapArray2(3, 1)
+
+    a.dump()    # [1, 1, 1]
+
+    var b = a^  # "move" The lifetime of `a` ends here
+
+    b.dump()    # [1, 1, 1]
+    # a.dump()  # ERROR: use of uninitialized value 'a' 
+
+"""
+__moveinit__ performs a shallow copy of existing field values (Pointers instead of heap-allocation), which makes it
+useful for types with heap-allocated values that are expensive to copy.
+
+To make further efforts to avoid your type being copied, can declare it "move-only". This is done by
+implementing __moveinit__ and excluding __copyinit__.
+The move-only type can be passed to other vars, and to funcs with any arg convention (borrowed, inout, owned),
+but you HAVE to use the ^ operator to end the lifetime of a move-only type when assiging it to a new var
+or when passing it as an OWNED argument.
+
+NOTE:
+There isn't a real benefit to the move constructor for heap-allocated fields.
+Copying simple types on the stack (Ints, Flaots, Booleans) is very cheap.
+But, if you allow copying, there's no reason to disallow moves, so you can use @value to synthesize both constructors.
+"""
+
 fn main():
     NoInstances.print_hello()
 
@@ -301,3 +400,6 @@ fn main():
 
     # Copy constructor HeapArray example
     copies()
+
+    # Move sonstructor/operator
+    moves()
