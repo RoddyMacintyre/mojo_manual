@@ -209,7 +209,81 @@ e.g. a HeapArray type that perfomrs a deep copy in the copy constructor:
 """
 
 struct HeapArray:
+    var data: Pointer[Int]
+    var size: Int
+    var cap: Int
+
+    fn __init__(inout self, size: Int, val: Int):
+        self.size = size
+        self.cap = size * 2
+        self.data = Pointer[Int].alloc(self.cap)
+
+        for i in range(self.size):
+            self.data.store(i, val)
+
+    fn __copyinit__(inout self, existing: Self):
+        # Deep-cpopy of the existing value
+        self.size = existing.size
+        self.cap = existing.cap
+        self.data = Pointer[Int].alloc(self.cap)
+
+        for i in range(self.size):
+            self.data.store(i, existing.data.load(i))   # LOAD instead of STORE
     
+    fn __del__(owned self):
+        # Must free the Heap-allocated data, but Mojo knows how to destroy the other fields
+        self.data.free()
+
+    fn append(inout self, val: Int):
+        # Update the array
+        if self.size < self.cap:
+            self.data.store(self.size, val)
+            self.size += 1
+        else:
+            print("Out of bounds")
+
+    fn dump(self):
+        # Print the array
+        print("[", end="")
+        for i in range(self.size):
+            if i > 0:
+                print(", ", end="")
+            print(self.data.load(i), end="")
+        print("]")
+
+"""
+NOTE:
+__copyinit__() does not copy the Pointer value (otherwise it would reference the same data as the original self).
+Instead, a new Pointer is initialized to allocate a new block of memory, to copy all heap-allocated values to (deep-copy).
+
+So, when we copy HeapArray, each copy has its own value on the heap. Cahanges are isolated per instance because of this.
+"""
+
+fn copies():
+    var a = HeapArray(2, 1)
+    var b = a   # Calls implemented __copyinit__()
+
+    a.dump()    # [1, 1]
+    b.dump()    # [1, 1]
+
+    b.append(2) # Changes only copied data in b, and doesn't affect a
+    b.dump()    # [1, 1, 2]
+    a.dump()    # [1, 1] (original a, unchanged)
+
+"""
+NOTE:
+In HeapArray, we must use __del__ to free heap-allocated data when the lifetime ends, but Mojo automatically
+destroys all other fields when their own lifetimes end. This is discussed further in Death of a Value
+
+If a type doesn't use any Pointers for heap-allocated data, then you don't have to implement
+the constructor and copy constructor (is only boilerplate at this state).
+For most structs that don't manage memory explicitly, you can just add the @value decorator to the struct definition 
+and Mojo will synthesize the __init__(), __copyinit__(), and __moveinit__() methods.
+
+NOTE:
+Mojo also calls the copy constructor when a value is passed as OWNED, AND when the LIFETIME of the value doesn't end at that point.
+If the lifetime of the value does end there (e.g. by declaring it transferred with the ^ operator), Mojo will invoke the MOVE constructor
+"""
 
 fn main():
     NoInstances.print_hello()
@@ -224,3 +298,6 @@ fn main():
     # Copy Constructor
     var mine3 = MyPet3("Kingy", 15)
     var yours = mine3
+
+    # Copy constructor HeapArray example
+    copies()
