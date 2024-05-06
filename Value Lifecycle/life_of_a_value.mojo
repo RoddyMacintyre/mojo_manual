@@ -461,14 +461,41 @@ then you don't have a "true" value type, and don't want move and copy anyway.
 MyPet above doesn't implement __del__, because Mojo doens't need it to destroy the values (see Death of a value)
 """
 
+# ========== Trivial Types ==========
+"""
+Trivial types are the small "bags of bits" that should be copied, moved and destroyed without custom lifecycle methods.
+Mojo doesn't need special support for these written in a struct. They are so tiny, that they should be passed around in CPU registers,
+and not indirectly through memory.
 
+Mojo has a struct decorator to achieve this: @register_passable("trivial").
+This decorator tells Mojo it should be copyable and movable, but that it has no user-defined methods for doing this.
+And it tells Mojo to pass the value in CPU registers whenever possible (for perf benefits)
+
+Below the @register passable on an Int from the STL
+"""
+
+@register_passable("trivial")
+struct Int:
+    var value: __mlir_type.index
+
+    fn __init__(value: __mlir_type.index) -> Int:
+        return Self {value: value}
+
+"""
+This decorator is used widely in the Mojo STL, but not used widely for app level code.
+For more info, see https://docs.modular.com/mojo/manual/decorators/register-passable 
+
+NOTE:
+The decorator is up for consideration to split between @value("trivial) and @register_passable, 
+as they are orthogonal concerns.
+"""
 
 
 fn main():
     NoInstances.print_hello()
 
     # Constructor
-    var mine = MyPet("Loke", 4)
+    var mine = MyPet("Lokie", 4)
 
     # Constrtuctor overloading
     var mine1 = MyPet1()
