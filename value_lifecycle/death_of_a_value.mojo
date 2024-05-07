@@ -46,5 +46,22 @@ Since String and Int don't require custom destruction, they have no-op destructo
 They are still there because Mojo can always call a destructor, making it easier to write generic library features.
 """
 
+# ========== Benefist of ASAP Destruction ===========
+"""
+Mojo's ASAP destruction has some benefits over scope-based destruction (like RAII in C++)
+    - Composes nicely with the MOVE optimization, which transforms a copy+del into a move
+    - Destroying at the end of scop can take performance hits in things like tail recursion, 
+        which could pose a memory problem as well for certain functional programming patterns.
+In Mojo, destruction always happens before the tail.
+
+ASAP destruction works well with Python style def functions, because Python doesn't provide scopes beyond a function scope.
+Meaning the Garbage Collector cleans up more often than a scope-based policy would.
+Mojo's ASAP is even more fine-grained than Python's garbage collection.
+
+Mojo's destruction policy is more like Rust and Swift, both having strong value ownership tracking and memory safety.
+Rust and Swift both make use of a dynamic "drop flag" (hidden shadow variables that do state tracking of values for safety)
+Often optimized away, Mojo drops it altogether, making code faster and less ambiguous.
+"""
+
 fn main():
     pets()
