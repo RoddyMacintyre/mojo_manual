@@ -31,7 +31,19 @@ fn pets():
 
 """
 Each initialization is matched with a destructor, and a is actually destroyed multiple times (once for every new value).
-This __del__ actually doesn't do anything but expose its calls. Mojo adds a no-op destructor if you don;t define one yourself.
+This __del__ actually doesn't do anything but expose its calls. Mojo adds a no-op destructor if you don't define one yourself.
+"""
+
+# ========== Default Destruction Behavior ==========
+"""
+Mojo can destroy a type without a destructor, and a no-op destructor is not necessary because Mojo only needs to destroy fields of MyPet.
+MyPet dioesn't dynamically allocate memory or use long-lived resources like filehandles.
+
+MyPet includes an Int and a String. Int is a trivial type, String is a mutable object with an internal List buffer field.
+This List stores contents in dynamically allocated memory on the Heap. The String itself has no destructor, but the List does, and that's what Mojo calls.
+
+Since String and Int don't require custom destruction, they have no-op destructors (__del__() methods that do nothing).
+They are still there because Mojo can always call a destructor, making it easier to write generic library features.
 """
 
 fn main():
