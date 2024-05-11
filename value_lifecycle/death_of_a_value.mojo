@@ -286,6 +286,43 @@ struct TwoStrings2:
 fn use_two_strings2():
     var two_strings = TwoStrings2("foo")
 
+# ========== Explicit Lifetimes ==========
+"""
+So far, we've explored default behavior and how it works. Sometimes though, Mojo cannot predict when a value is last used,
+and will destory a value that is still referenced through some other means.
+
+For example:
+Building a type with a field that has a Pointer to another field. The compiler cannot reason about this (yet), and thus might destroy
+a field when it's technically no longer used, even though another object still holds a Pointer to part of it.
+To not break the program, you need to keep the first object alive until you can execute some special logic in the 
+destructor or move initializer.
+
+You can force Mojo to keep a value alive up to a certain point by assigning the value to the discard "_" pattern. This will signal
+to Mojo the last point of use, making you able to control that point!
+
+For example:
+fn __del__(owned self):
+    self.dump()     # self is still whole here
+
+    consume(self.obj2^)
+    _ = self.obj1
+    # Mojo keeps obj1 alive until here, after its "last use"
+
+If consume() refers to some value in obj1, this mechanism ensures it won;t be destroyed until "_" last use.
+
+In other scenario's you can use the Python-style with operator to define a scope. Here,
+Mojo will keep the object entered with the with statement alive until the with statement has ended.
+
+with open("my_file.txt", "r") as file:
+    print(file.read())
+    # Do stuff
+    foo()
+    # Do more stuff...
+
+# file is destroyed here, after the open() statement.
+"""
+
+
 fn main():
     pets()
 
