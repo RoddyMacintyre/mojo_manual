@@ -166,6 +166,66 @@ The self value inside the __del__ is still whole (so all fields still usable) un
 This will be discussed below...
 """
 
+# ========== Field Lifetimes ==========
+"""
+Aside tracking the lifetime of all objects, Mojo also tracks each field of a struct independently.
+This way, Mojo can track fully/partially initialized/destroyed objects, and destroys each field independently.
+
+Consider the following change of a field value:
+"""
+
+@value
+struct MyPet4:
+    var name: String
+    var age: Int
+
+fn use_two_strings():
+    var pet = MyPet4("Po", 8)
+    print(pet.name)
+    # pet.name.__del__() runs here, because this instance is no longer used.
+    # It's replaced below
+
+    pet.name = String("Lola")   # Overwrite pet.name
+    print(pet.name)
+    # pet.__del__() runs here
+
+"""
+The compiler already knows that pet.name is no longer used, so it calls its destructor before the new assignment.
+You can also see this behavior when using the transfer operator:
+"""
+
+fn consume(owned arg: String):
+    pass
+
+fn use(arg: MyPet):
+    print(arg.name)
+
+fn consume_and_use():
+    var pet = MyPet("Selma", 8)
+    consume(pet.name^)
+    # pet.name.__moveinit() runs here, which destroys pet.name
+    # Now pet is onlt partially initialized
+
+    # use(pet)  # This would cause a compile error because pet is only partially initialized
+
+    pet.name = String("Lola")   # Fully initialize again
+    use(pet)                    # Works now
+    # pet.__del__() runs here (only if the object if whole/full)
+
+"""
+Ownership of `name` is transferred to consume(), and the compiler knows that pet is only partially initialized.
+The name field is later reinitialized before being passed to use().
+
+Additionally, if you don't reinitialize name by the end of the lifetime of pet, Mojo will complain about
+destroying a partially initialized object.
+
+So Mojo enforces that objects must be whole at construction and destruction, so the aggregate methods can be used (__init__ & __del__).
+This way you need to create and destroy objects with the lifetime methods.
+"""
 
 fn main():
     pets()
+
+    # Field lifetimes:
+    use_two_strings()
+    consume_and_use()
