@@ -223,9 +223,75 @@ So Mojo enforces that objects must be whole at construction and destruction, so 
 This way you need to create and destroy objects with the lifetime methods.
 """
 
+# ========== Field lifetimes during Destruct & Move ==========
+"""
+The move constructor and destructor for field lifetimes is interesting, because they both take an instance of
+their own type as an owned arg, which is about to be destroyed.
+It is not a daily concern, but it's good to understand how this works with Field Lifetimes.
+
+As a recap here are the typical move and destruct methods:
+struct TwoStrings:
+    fn __moveinit__(inout self, owned existing: Self):
+        # Initialize a new `self` by consuming the contents of `existing`
+    fn __del__(owned self):
+        # Destroys all resources in `self`
+
+NOTE:
+The 2 types of self:
+- Self: Alias for the current type name (used as a type specifier for the `existing` argument)
+- self: implicitely passed reference to the current instance (aka this, also implicitly a Self type)
+
+The move constructor and destructor must dismantle the existing/self value that's owned.
+This means __moveinit__() implicitly destroys sub-elements of existing to transfer ownership to a new instance.
+And __del__() implements the deletion logic for its self.
+
+For this, they both need to own and transform elements of the owned value, and definitely don;t want the original
+owned value's destructor to also run. In the case of __moveinit__() you would get a DOUBLE-FREE ERROR,
+and in the case of the __del__() you would get an infinite loop.
+
+To solve this, Mojo assumes that their whole values are destroyed when reaching any return from the method.
+This means that in this case, the whole object may be used as usual, up until the field values are transferred,
+or the method returns.
+
+For example below (in the __del__ can still pass ownership of a field to another function and in the __del__ there's no infinite loop)
+"""
+
+fn consume1(owned str: String):
+    print("Consumed", str)
+
+struct TwoStrings2:
+    var str1: String
+    var str2: String
+
+    fn __init__(inout self, one: String):
+        self.str1 = one
+        self.str2 = String("bar")
+
+    fn __moveinit__(inout self, owned existing: Self):
+        self.str1 = existing.str1
+        self.str2 = existing.str2
+
+    fn __del__(owned self):
+        self.dump() # Self is still whole here
+        # Mojo calls self.str2.__del__() since str2 isn't used anymore
+
+        consume(self.str1^)
+        # self.str1 has been transferred so it is also destroyed now;
+        # `self.__del__()` is not called, avoiding an infinite loop
+
+    fn dump(inout self):
+        print("str1:", self.str1)
+        print("str2:", self.str2)
+
+fn use_two_strings2():
+    var two_strings = TwoStrings2("foo")
+
 fn main():
     pets()
 
     # Field lifetimes:
     use_two_strings()
     consume_and_use()
+
+    # Field lifetimes during destruct & move
+    use_two_strings2()
