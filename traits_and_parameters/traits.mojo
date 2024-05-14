@@ -60,13 +60,14 @@ fn make_it_quack(definitely_a_duck: Duck):
 fn make_it_quack(not_a_duck: StealthCow):
     not_a_duck.quack()
 
-fn main():
-    make_it_quack(Duck())
-    make_it_quack(StealthCow())
-
 """
 This will get out of hand when defining a lot of types.
 Notice that in Mojo versions of make_it_quack(), we don;t include the try/except statement.
 It is not needed because of Mojo's static type checking. The compiler enforces that the inputs
 are of the correct type before running the program.
 """
+
+fn main():
+    make_it_quack(Duck())
+    make_it_quack(StealthCow())
+
