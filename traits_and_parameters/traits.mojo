@@ -123,6 +123,18 @@ You can't add traits to existing types, like adding traits to Float64, or Int. H
 the STL (Standard Type Library) already includes a few traits and more will be added.
 """
 
+# ========== Traits can require Static Methods ==========
+"""
+Traits can specify required static methods. For example:
+"""
+# trait HasStaticMethod:
+#     @staticmethod
+#     fn do_stuff(self):
+#         ...
+
+# fn fun_with_traits[T: HasStaticMethod]():
+#     T.do_stuff()
+
 fn main():
     make_it_quack(Duck())
     make_it_quack(StealthCow())
