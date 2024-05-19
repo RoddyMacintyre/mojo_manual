@@ -135,6 +135,27 @@ Traits can specify required static methods. For example:
 # fn fun_with_traits[T: HasStaticMethod]():
 #     T.do_stuff()
 
+# ========== Implicit Trait Conformance ==========
+"""
+Mojo support implicit trait conformance. This means that even if a type doesn;t explicitly implement at trait,
+if it has all the methods of said trait, it's treated as conforming to the trait.
+For example:
+"""
+
+@value
+struct RubberDucky:
+    fn quack(self):
+        print("Squeak!")
+
+"""
+This can be handy if you define traits that you want to work with types that you don't control (like STL/3rd party types).
+It is recommended to always do trait conformance explicitly. It has the following advantages:
+
+    - Documentation/readability; it's clear it implements the trait
+    - Future feature support; when default method implementations are added to traits, they'll onlt work for explicitly conforming types.
+"""
+
+
 fn main():
     make_it_quack(Duck())
     make_it_quack(StealthCow())
@@ -143,3 +164,5 @@ fn main():
     make_it_quack_1(Duck1())
     make_it_quack_1(StealthCow1())
 
+    # Implicit trait conformance
+    make_it_quack_1(RubberDucky())
