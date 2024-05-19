@@ -223,6 +223,28 @@ They can't define copy/move constructors because they don;t require custom logic
 For purpose of trait conformance, the compiler treats trivial types as copyable/movable.
 """
 
+# ========== Built-in Traits ==========
+"""
+Mojo STL includes some traits. They're implemented by some standard library Types,
+and you could implement them for your own types.
+
+The current list is:
+    - AnyType
+    - Boolable
+    - CollectionElement
+    - Copyable
+    - Intable
+    - KeyElement
+    - Movable
+    - PathLike
+    - Sized
+    - Stringable
+
+The following link includes explanations and usage examples of these Traits: https://docs.modular.com/mojo/stdlib/builtin/ 
+
+"""
+
+
 fn main():
     make_it_quack(Duck())
     make_it_quack(StealthCow())
