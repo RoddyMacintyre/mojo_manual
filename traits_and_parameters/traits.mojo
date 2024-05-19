@@ -244,6 +244,17 @@ The following link includes explanations and usage examples of these Traits: htt
 
 """
 
+# ========== Sized Trait ==========
+
+
+# ========== Intable/Stringable Trait ==========
+
+
+# ========== AnyType Trait ==========
+
+
+# ========== Generic Structs with Traits ==========
+
 
 fn main():
     make_it_quack(Duck())
