@@ -215,6 +215,13 @@ struct Thing(MassProducible):
     fn __moveinit__(inout self, owned existing: Self):
         self.id = existing.id
 
+"""
+NOTE:
+@register_passable("trivial") types have restrictions on their lifecycle methods.
+They can't define copy/move constructors because they don;t require custom logic.
+
+For purpose of trait conformance, the compiler treats trivial types as copyable/movable.
+"""
 
 fn main():
     make_it_quack(Duck())
