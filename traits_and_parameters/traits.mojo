@@ -155,6 +155,39 @@ It is recommended to always do trait conformance explicitly. It has the followin
     - Future feature support; when default method implementations are added to traits, they'll onlt work for explicitly conforming types.
 """
 
+# ========== Trait Inheritance ==========
+"""
+Traits can inherit from other traits. It includes all the requirements declared by the parent trait.
+For example:
+"""
+
+trait Animal:
+    fn make_sound(self):
+        ...
+
+# Bird inherits from Animal:
+trait Bird(Animal):
+    fn fly(self):
+        ...
+
+"""
+A struct conforming to the Bird trait, must conform to both the Bird and Animal trait.
+And since every Bird conforms to Animal, a struct that conforms to Bird can be passed to any func
+requiring an Animal.
+
+To inherit from multiple traits, add a comma separated list in the parenteses.
+E.g. create a NamedAnimal, that is both Named and an Animal traited.
+"""
+
+trait Named:
+    fn get_name(self) -> String:
+        ...
+
+
+trait NamedAnimal(Animal, Named):
+    pass
+
+
 
 fn main():
     make_it_quack(Duck())
