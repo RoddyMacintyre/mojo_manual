@@ -187,6 +187,33 @@ trait Named:
 trait NamedAnimal(Animal, Named):
     pass
 
+# ========== Traits and Lifecycle Methods ==========
+"""
+Traits can specify required lifecycle methods, including __init__, __copyinit__ and __movinit__.
+E.g. Below code creates a Massproducible trait, which has a default constructor and can be moved.
+For this, it uses the built in Movable Trait, which requires the type to have a move constructor (__movinit__).
+
+The factory[]() func returns a newly-constructed instance of a MassProducible type.
+"""
+
+trait DefaultConstructible:
+    fn __init__(inout self):
+        ...
+
+trait MassProducible(DefaultConstructible, Movable):
+    pass
+
+fn factory[T: MassProducible]() -> T:
+    return T()
+
+struct Thing(MassProducible):
+    var id: Int
+
+    fn __init__(inout self):
+        self.id = 0
+
+    fn __moveinit__(inout self, owned existing: Self):
+        self.id = existing.id
 
 
 fn main():
@@ -199,3 +226,7 @@ fn main():
 
     # Implicit trait conformance
     make_it_quack_1(RubberDucky())
+
+    # Traits and Lifecycle Methods
+    var thing = factory[Thing]()
+    print(thing.id)
