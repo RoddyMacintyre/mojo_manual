@@ -298,7 +298,13 @@ In statically types languages the compiler needs to be able to identify the Type
 E.g. if the container needs to copy a value, the compiler needs to know if the value type is copyable.
 
 List is an example of a generic container. But a sinlge List can only hold one type of data.
-For example a List of integers:
+For example a List of integers as in the main below.
+
+You can use Traits to define requirements for elements in a container. E.g. List requires
+movable and copyable.
+To store a Struct in a List, it must conform to the CollectionElement Trait (requires __copy__ and __move__)
+
+Generics is an advanced topic which is covered in the next section.
 """
 from collections import List 
 
