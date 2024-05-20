@@ -292,6 +292,16 @@ the destructors of all items are called.
 """
 
 # ========== Generic Structs with Traits ==========
+"""
+You can use Traits when defining a generic container (a container that can hold different types).
+In statically types languages the compiler needs to be able to identify the Types in the container at compile time. 
+E.g. if the container needs to copy a value, the compiler needs to know if the value type is copyable.
+
+List is an example of a generic container. But a sinlge List can only hold one type of data.
+For example a List of integers:
+"""
+from collections import List 
+
 
 
 fn main():
@@ -315,3 +325,8 @@ fn main():
     # Stringable Trait
     var spot = Pet("Spot", "dog")
     print(spot)
+
+    # Generic Structs with Traits
+    var list = List[Int](1, 2, 3)
+    for i in range(len(list)):
+        print(list[i], sep=" ", end="")
