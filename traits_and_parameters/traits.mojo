@@ -245,6 +245,20 @@ The following link includes explanations and usage examples of these Traits: htt
 """
 
 # ========== Sized Trait ==========
+"""
+Sized Trait identifies types that have a measurable length, like Strings and Arrays.
+It enforces Types to implement __len__. 
+For example:
+"""
+
+struct MyList(Sized):
+    var size: Int
+
+    fn __init__(inout self):
+        self.size = 0
+
+    fn __len__(self) -> Int:
+        return self.size
 
 
 # ========== Intable/Stringable Trait ==========
@@ -270,3 +284,6 @@ fn main():
     # Traits and Lifecycle Methods
     var thing = factory[Thing]()
     print(thing.id)
+
+    # Sized trait
+    print(len(MyList()))
