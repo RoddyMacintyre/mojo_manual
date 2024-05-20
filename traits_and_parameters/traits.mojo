@@ -262,7 +262,20 @@ struct MyList(Sized):
 
 
 # ========== Intable/Stringable Trait ==========
+"""
+These Traits identify types that can be implicitly converted to Int & String.
+Any type that conforms to Stringable works with the built-in print() and str() functions.
+Any Intable works with the built-in int() function
+For example:
+"""
 
+@value
+struct Pet(Stringable):
+    var name: String
+    var type: String
+
+    fn __str__(self) -> String:
+        return "This is a " + self.type + " named " + self.name
 
 # ========== AnyType Trait ==========
 
@@ -287,3 +300,7 @@ fn main():
 
     # Sized trait
     print(len(MyList()))
+
+    # Stringable Trait
+    var spot = Pet("Spot", "dog")
+    print(spot)
