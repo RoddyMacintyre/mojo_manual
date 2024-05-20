@@ -278,7 +278,18 @@ struct Pet(Stringable):
         return "This is a " + self.type + " named " + self.name
 
 # ========== AnyType Trait ==========
+"""
+When building a generic container type, a challenge is knowing how to disposed the contained items when it is destroyed.
+Any type that dynamically allocates memory needs to supply a __del__ method that must be called to free the allocated mem.
+However, not all types implement the __del__ and Mojo has no way to tell which is which.
 
+AnyType solves this by letting any Trait implicitly inherit from AnyType, and all Structs implicitly conform to the Trait.
+This guarantees that all types have a __del__ implemented. If types have no explicit destructor, the no-op is added by Mojo.
+In effect, you can call del on any type.
+
+This makes it possible to build generic collections without leaking memory; when a collection's del is called,
+the destructors of all items are called.
+"""
 
 # ========== Generic Structs with Traits ==========
 
