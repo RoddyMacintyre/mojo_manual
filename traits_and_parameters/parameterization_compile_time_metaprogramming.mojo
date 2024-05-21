@@ -47,5 +47,63 @@ been transformed to an intermediate MLIR representation.
 If the compiler cnnot resolve all Parameters, it fails.
 """
 
+# ========== Parameterized Structs ==========
+"""
+You can use parameterized structs to build generic containers. 
+Below an example of a generic Array type:
+"""
+
+struct GenericArray[T: AnyRegType]:
+    var data: Pointer[T]
+    var size: Int
+
+    fn __init__(inout self, *elements: T):
+        self.size = len(elements)
+        self.data = Pointer[T].alloc(self.size)
+
+        for i in range(self.size):
+            self.data[i] = elements[i]
+
+    fn __del__(owned self):
+        self.data.free()
+
+    fn __getitem__(self, i: Int) raises -> T:
+        if (i < self.size):
+            return self.data[i]
+        else:
+            raise Error("Out of bounds")
+
+"""
+The T is a placeholder for the datatype to store in the Array (a Type parameter). T is typed as AnyRegType.
+This is a meta type representing any register-passable type, meaning the Array can hold fixed-size datatypes (e.g. Ints, Flaots)
+that can be passed in a machine register. It does not represent dynamically allocated data (Strings, vectors, etc.)
+
+NOTE:
+"T" can be anyu name or symbol, it's used as a convention
+
+As with Parameterized funcs,  you need to pass Parameter values when using a Parameterized struct. In the case of the example,
+when instantiating the Array, you need to specify the type to store.
+T is used throughout the struct where you'd usually see a single type name (e.g. return type of __getitem__).
+
+Besides an AnyRegType, there's a more generic AnyType, which includes all Mojo types.
+
+A parametereized struct can use the Self type to represent a concrete instance of the struct (all Params specified).
+You could add a static factory method to create concrete types structs.
+
+@staticmethod
+fn splat(count: Int, value: T) -> Self
+    # create new array with {count} instances of the given value
+
+GenericArray[Float64].splat(8, 0)
+"""
+
 fn main():
     repeat[3]("Hello")
+
+    # Parameterized Structs
+    var gen_arr = GenericArray[Int](1, 2, 3, 4)
+    try:
+        for i in range(gen_arr.size):
+            print(gen_arr[i], sep=" ", end="")
+    except:
+        print("Errrrrrr")
