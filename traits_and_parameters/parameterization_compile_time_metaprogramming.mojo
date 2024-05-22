@@ -97,6 +97,54 @@ fn splat(count: Int, value: T) -> Self
 GenericArray[Float64].splat(8, 0)
 """
 
+# =========== CASE STUDY: The SIMD type ==========
+"""
+Single Instruction Multpile Data is a parallel processing technique built into many modern Processors. It allows you to do a
+single operation on multiple pieces of data at once.
+
+Processors implement SIMD using low-level vector registers in hardware that hold multiple instancees of a Scalar data type.
+The data must be shaped into the proper SIMD width (datatype) and length (vector size). Processors may support 512-bit or longer
+SIMD vectors, and support many datatypes (from 8-bit ints to 64-bit floats).
+
+Mojo's SIMD type is defined as a struct, and exposes the common SIMD operations through itsmethods,
+and makes the SIMD datatype and values Parametric, allowing you to directly map data to SIMD vectors on any hardware.
+
+Below an abridged version:
+
+struct SIMD[type: DType, size: Int]:
+    var value: ... # low-level MLIR stuff...
+
+    # Create new SIMD from a number of Scalars
+    fn __init__(inout self, *elems: SIMD[type, 1]): ...
+
+    # Fill SIMD with duplicated Scalar data
+    @staticmethod
+    fn splat(x: SIMD[type, 1]) -> SIMD[type, size]: ...
+
+    # Cast SIMD elems to different elt type.
+    fn cast[target: DType](self) -> SIMD[target, size]: ...
+
+    # Many standard operators are supported
+    fn __add__(self, rhs: Self) -> Self
+
+You can create a SIMD vector as follows:
+
+var vector = SIMD[DType.int16, 4](1, 2, 3, 4)
+vector = vector * vector
+for i in range(4):
+    print(vector[i], sep=" ", end="")
+
+prints: 1  4  9  16
+
+As can be seen, * operates on the entire vector at once.
+Defining each SIMD variant with Parameters is great for code reuse because the SIMD type ccan express all the different
+vector variants statically, in stead of requiring to pre-define every variant.
+
+Because SIMD is Parameterized, the self arg in its functions carry those Parameters (the full type name is SIMD[type, size]).
+Although valid to write this out, this can be verbose, so instead using Self is recommended as it does the same.
+"""
+
+
 fn main():
     repeat[3]("Hello")
 
