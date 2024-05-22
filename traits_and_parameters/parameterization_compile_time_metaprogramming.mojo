@@ -144,6 +144,72 @@ Because SIMD is Parameterized, the self arg in its functions carry those Paramet
 Although valid to write this out, this can be verbose, so instead using Self is recommended as it does the same.
 """
 
+# ========== Overloading on Parameters ==========
+"""
+Functions and methods can be overloaded on their PArameters. The overload resolution logic filters for candidates according to the following rule in ordeR:
+    1. Minimal number of implicit conversions
+    2. Without variadic args
+    3. without variadic parameters
+    4. shortest parameter signature
+    5. Non-@staticmethod over @ststicmethod
+
+If there is more than one candidate, overload resolution fails.
+For example:
+"""
+
+# Is used in parameters
+@register_passable("trivial")
+struct MyInt:
+    """A type that is implicitly convertible to `Int`"""
+    var value: Int
+
+    @always_inline("nodebug")
+    fn __init__(_a: Int) -> Self:    # Why is this returned here?
+        return Self {value: _a}
+
+# Some overloading
+fn foo[x: MyInt, a: Int]():
+    print("foo[x: MyInt, a: Int]")
+
+fn foo[x: MyInt, a: MyInt]():
+    print("foo[x: MyInt, a: MyInt]")
+
+fn bar[a: Int](b: Int):
+    print("bar[a: Int](b: Int)")
+
+fn bar[a: Int](*b: Int):
+    print("bar[a: Int](*b: Int)")
+
+fn bar[*a: Int](b: Int):
+    print("bar[*a: Int](b: Int)")
+
+fn parameter_overloads[a: Int, b: Int, x: MyInt]():
+    # foo[x: MyInt, a: Int]() is called because it requires no implicit conversions
+    # foo[x: MyInt, y: MyInt] does require implicit conversion.
+    foo[x, a]()
+
+    # bar[a: Int](b: Int) is called because it does not have variadic args or params
+    bar[a](b)
+
+    # bar[*a: Int](b: Int) is called because it has variadic params
+    bar[a, a, a](b)
+
+# Another example with a struct
+struct MyStruct:
+    fn __init__(inout self):
+        pass
+
+    fn foo(inout self):
+        print("Calling instance method")
+    
+    @staticmethod
+    fn foo():
+        print("Calling static method")
+
+fn test_static_overload():
+    var a = MyStruct()
+    # foo(inout self) is called because it's not @staticmethod
+    a.foo()
 
 fn main():
     repeat[3]("Hello")
@@ -155,3 +221,7 @@ fn main():
             print(gen_arr[i], sep=" ", end="")
     except:
         print("Errrrrrr")
+
+    # Overloading Parameters
+    parameter_overloads[1, 2, MyInt(3)]()
+    test_static_overload()
