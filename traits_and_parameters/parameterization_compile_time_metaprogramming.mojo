@@ -211,6 +211,58 @@ fn test_static_overload():
     # foo(inout self) is called because it's not @staticmethod
     a.foo()
 
+# ========== Using Parameterized types and Functions ==========
+"""
+You can instantiate Parametric types and functions by passing values to the parameters in [].
+E.g. For the SIMD type above, type specifies the data type, and size specifies the length of the SIMD vector (power of 2).
+
+var small_vec = SIMD[DType.float32, 4](1.0, 2.0, 3.0, 4.0)
+
+# Make a big vector containing 1.0 in float16 format
+var big_vec = SIMD[DType.float16, 32].splat(1.0)
+
+# Do some math and convert the elements to float32
+var bigger_vec = (big_vec+big_vec).cast[DType.float32]()
+
+# You can write types out explicitly if you want
+var bigger_vec: SIMD[DType.float32, 32] = bigger_vec
+
+print('small_vec type:', small_vec.element_type, 'length: ', len(small_vec))
+print('bigger_vec2 type:', bigger_vec2.element_type, 'length: ', len(bigger_vec2)
+
+PRINTS:
+small_vec_type: float32 length: 4
+bigger_vec2 type: float32 length: 32
+
+NOTE:
+cast() also needs a parameter to specify the type you want to cast to (target Parametric value).
+So, just as SIMD is a generic Type definition, cast is a generic method definition that gets instantiated
+at compile-time instead of runtime, based on the parameter value.
+
+The code above shows use of concrete types, but the major power of Parameters comes from the ability
+to defin Parametric algorithms and Types (code that uses the parameter values).
+
+e.g. here's how to define a parametric algorithm with SIMD that is type- and width- agnostic:
+"""
+
+from math import sqrt
+
+fn rsqrt[dt: DType, width: Int](x: SIMD[dt, width]) -> SIMD[dt, width]:
+    return 1 / sqrt(x)
+
+"""
+The x argument is actually a SIMD type, based on the func params. The runtime program can use the value
+of the params, because the params are resolved at compile-time before they are needed by the program.
+Compile-time parameter expressions, however, cannot use runtime values.
+
+NOTE:
+Above function is able to call the parametric sqrt[]() func without specifying the parameters - the compiler
+infers its parameters based on the parametric x value passed into it, as if you wrote sqrt[dt, width](x) explicitly.
+
+NOTE:
+rsqrt() chose to name its second parameter width, eventhough the SIMD type names it size, and that's not a problem.
+"""
+
 fn main():
     repeat[3]("Hello")
 
@@ -225,3 +277,7 @@ fn main():
     # Overloading Parameters
     parameter_overloads[1, 2, MyInt(3)]()
     test_static_overload()
+
+    # Parametered types and functions
+    var v = SIMD[DType.float16, 4](42)
+    print(rsqrt(v))
