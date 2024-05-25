@@ -263,6 +263,58 @@ NOTE:
 rsqrt() chose to name its second parameter width, eventhough the SIMD type names it size, and that's not a problem.
 """
 
+# ========== Optional Parameters and Keyword Parameters ==========
+"""
+You can define optional parameters by giving it a default value. You can also pass parameters by keyword arguments.
+This way for a function or struct with params, you can specify the parameter you wish to pass and keep the rest as defaults.
+
+e.g.:
+"""
+fn speak[a: Int = 3, msg: StringLiteral = "woof"]():
+    print(msg, a)
+
+fn use_defaults() raises:
+    speak()
+    speak[5]()
+    speak[7, "meow"]()
+    speak[msg="baa"]()
+
+"""
+When a parametric function is called, Mojo can infer the values; it can use the parameter values attached to an
+argument value (see the sqrt[]() example).
+If the parametric func also has a default value defined, then the inferred parameter type takes precedence.
+
+E.g. in the follwing code, we update speak[]() to take an argument with a paremtric type. Although it has a default 
+parameter value for a, Mojo instead uses the inferred a parameter value from the bar argument.
+"""
+
+@value
+struct Bar[v: Int]:
+    pass
+
+fn foo[a: Int = 3, msg: StringLiteral = "woof"](bar: Bar[a]):
+    print(msg, a)
+
+fn use_inferred():
+    foo(Bar[9]())   # prints "woof 9"
+
+"""
+You can also use optional parameters and kwargs in a struct:
+"""
+struct KwParamStruct[greeting: String = "Hello", name: String = "🔥mojo🔥"]:
+    fn __init__(inout self):
+        print(greeting, name)
+
+fn use_kw_params():
+    var a = KwParamStruct[]()
+    var b = KwParamStruct["World"]()
+    var c = KwParamStruct[greeting="Hola"]()
+
+"""
+NOTE:
+Mojo supports positional-only and keyword-only parameters, following the same rules as positional-only and keyword-only arguments.
+"""
+
 fn main():
     repeat[3]("Hello")
 
@@ -281,3 +333,12 @@ fn main():
     # Parametered types and functions
     var v = SIMD[DType.float16, 4](42)
     print(rsqrt(v))
+
+    # Optional & kw params
+    try:
+        _ = use_defaults()
+    except:
+        print("Could not execute function")
+
+    use_inferred()
+    use_kw_params()
