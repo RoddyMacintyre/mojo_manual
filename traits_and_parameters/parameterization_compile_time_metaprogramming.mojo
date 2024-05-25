@@ -315,6 +315,31 @@ NOTE:
 Mojo supports positional-only and keyword-only parameters, following the same rules as positional-only and keyword-only arguments.
 """
 
+# ========== Variadic Parameters ==========
+"""
+Example of variadic parameters:
+"""
+struct MyTensor[*dimensions: Int]:
+    pass
+
+"""
+Variadic parameters currently have some limitations as opposed to variadic arguments:
+    - Must be homogeneous (same Types)
+    - Must be register-passable
+    - The values are not automatically projected into a VariadicList, so you need to construct it explicitly
+
+NOTE:
+Variadic kw parameters are not supported yet.
+"""
+fn sum_params[*values: Int]() -> Int:
+    alias list = VariadicList(values)
+    var sum = 0
+    
+    for v in list:
+        sum += v
+
+    return sum
+
 fn main():
     repeat[3]("Hello")
 
