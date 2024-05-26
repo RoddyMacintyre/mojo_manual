@@ -365,6 +365,43 @@ fn concat[ty: DType, len1: Int, len2: Int](
     return result
 
 
+# ========== Powerful Compile-time Programming ==========
+"""
+While simple expressions are useful, sometimes you need imperative compile-time logic with control flow.
+Can even do compile-time recursion.
+
+E.g. Here's a "tree reduction" algorithm that sums all elements of a vector recursively into scalar:
+"""
+
+fn slice[ty: DType, new_size: Int, size: Int](
+    x: SIMD[ty, size], offset: Int) -> SIMD[ty, new_size]:
+    var result = SIMD[ty, new_size]()
+
+    for i in range(new_size):
+        result[i] = SIMD[ty, 1](x[i + offset])
+    
+    return result
+
+# The recusrive function:
+fn reduce_add[ty: DType, size: Int](x: SIMD[ty, size]) -> Int:
+    # Use @parameter to create a parametric if condition (compile-time if)
+    # Condition needs to be a valid parameter expression, and ensures only the live branch is
+    # compiled into the program.
+    @parameter
+    if size == 1:
+        return int(x[0])
+    elif size == 2:
+        return int(x[0]) + int(x[1])
+    
+    # Extract the top/bottom halves, add, and sum the elements
+    alias half_size = size // 2
+    var lhs = slice[ty, half_size, size](x, 0)
+    var rhs = slice[ty, half_size, size](x, half_size)
+
+    return reduce_add[ty, half_size](lhs + rhs)
+
+
+
 fn main():
     repeat[3]("Hello")
 
@@ -398,3 +435,8 @@ fn main():
     var x = concat[DType.float32, 2, 2](a, a)
 
     print('Result type: ', x.element_type, '\tLength: ', len(x))
+
+    # Powerful Compile-time Programming
+    var y = SIMD[DType.index, 4](1, 2, 3, 4)
+    print(y)
+    print("Elements sum: ", reduce_add(y))
