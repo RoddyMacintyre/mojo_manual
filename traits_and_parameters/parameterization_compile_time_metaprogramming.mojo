@@ -401,6 +401,49 @@ fn reduce_add[ty: DType, size: Int](x: SIMD[ty, size]) -> Int:
     return reduce_add[ty, half_size](lhs + rhs)
 
 
+# ========== Mojo Types are just Parameter Expressions ==========
+"""
+Type annotations themselves can be arbitrary expressions (just like in Python).
+Types in Mojo have a special Metatype Type, allowing type-parametric algorithms and functions to be defined.
+
+E.g. A simplified Array that supports arbitrary types of elements (AnyRegType parameter):
+"""
+
+struct Array[T: AnyRegType]:
+    var data: Pointer[T]
+    var size: Int
+
+    fn __init__(inout self, size: Int, value: T):
+        self.size = size
+        self.data = Pointer[T].alloc(self.size)
+
+        for i in range(self.size):
+            self.data[i] = value
+
+    fn __getitem__(self, i: Int) -> T:
+        return self.data[i]
+
+    fn __del__(owned self):
+        self.data.free()
+
+"""
+NOTE:
+The T parameter is being used as the formal type for the VALUE arguments and the return type of __getitem__().
+Parameters allow the Array type to provide different APIs based on different use-cases.
+
+Many cases benefit from advanced Parameter usage, e.g. execute a closure n times in parallel,
+feeding in a value from the context as follows:
+"""
+fn parallelize[func: fn(Int) -> None](num_work_items: Int):
+    # Not actually parallel, see the algorithm module for a real impl.
+    for i in range(num_work_items):
+        func(i)
+
+"""
+Another important example is variadic generics, where an algorithm or datastructure may need to be defined over
+a list of heterogeneous types, such as for a tuple.
+It is not yet fully supported in Mojo, and requires some MLIR tweaking by hand. It's scheduled for the future!
+"""
 
 fn main():
     repeat[3]("Hello")
@@ -440,3 +483,7 @@ fn main():
     var y = SIMD[DType.index, 4](1, 2, 3, 4)
     print(y)
     print("Elements sum: ", reduce_add(y))
+
+    # Mojo Types are just Parameter Expressions
+    var w = Array[Float32](4, 3.14)
+    print(w[0], w[1], w[2], w[3])
