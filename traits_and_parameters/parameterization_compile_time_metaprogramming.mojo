@@ -340,6 +340,31 @@ fn sum_params[*values: Int]() -> Int:
 
     return sum
 
+
+# ========== Parameter Expressions (are just Mojo code) ==========
+"""
+A parameter expression is any expression where a parameter is expected. They support operators and function calls,
+just like runtime code, and all parameter types use the same type system as the runtime program (like Int, DType, etc.)
+
+Because they use the same grammar and types as runtime Mojo, you can use many "dependent type" features.
+E.g. A helper function to concatenate 2 SIMD vectors:
+"""
+
+fn concat[ty: DType, len1: Int, len2: Int](
+    lhs: SIMD[ty, len1], rhs: SIMD[ty, len2]) -> SIMD[ty, len1+len2]:
+
+    # Resulting len is nothing more than the sum of the input vector lengths, expressed with a + operator.
+    var result = SIMD[ty, len1 + len2]()
+
+    for i in range(len1):
+        result[i] = SIMD[ty, 1](lhs[i])
+    
+    for j in range(len2):
+        result[len1 + j] = SIMD[ty, 1](rhs[j])
+    
+    return result
+
+
 fn main():
     repeat[3]("Hello")
 
@@ -367,3 +392,9 @@ fn main():
 
     use_inferred()
     use_kw_params()
+
+    # Parameter Expressions (are just Mojo code)
+    var a = SIMD[DType.float32, 2](1, 2)
+    var x = concat[DType.float32, 2, 2](a, a)
+
+    print('Result type: ', x.element_type, '\tLength: ', len(x))
