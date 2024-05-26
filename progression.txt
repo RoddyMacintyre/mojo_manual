@@ -1,1 +1,1 @@
-https://docs.modular.com/mojo/manual/values/ownership#transfer-arguments-owned-and-
+https://docs.modular.com/mojo/manual/traits
