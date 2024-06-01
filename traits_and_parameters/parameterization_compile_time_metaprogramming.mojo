@@ -445,6 +445,38 @@ a list of heterogeneous types, such as for a tuple.
 It is not yet fully supported in Mojo, and requires some MLIR tweaking by hand. It's scheduled for the future!
 """
 
+# ========== ALIAS: named parameter expressions ==========
+"""
+It's common to name cimpile-time values. Var defines a runtime value, ALIAS defines a compile-time value.
+
+E.g. the DType struct implements a simple enum using aliases for the enumerators:
+
+struct DType:
+    var value: UInt8
+    alias invalid = DType(0)
+    alias bool = DType(1)
+    alias int8 = DType(2)
+    alias uint8 = DType(3)
+    alias int16 = DType(4)
+    alias uint16 = DType(5)
+    ...
+    alias float32 = DType(15)
+
+The above allows a client to use DType.float32 as a parameter expression (also works as a runtime value) naturally.
+NOTE: This is invoking the runtime constructor for DType at compile-time.
+
+Types are another common use for aliases. Because Types are compile-time expressions, 
+it's handy to do things like the following:
+
+alias Float16 = SIMD[DType.float16, 1]
+alias UInt8 = SIMD[DType.uint8, 1]
+
+var x: Float16    # Floatq16 works like a "typedef"
+
+NOTE:
+Aliases also obey scope, so you can use local ALIASES.
+"""
+
 fn main():
     repeat[3]("Hello")
 
