@@ -519,6 +519,60 @@ NOTE:
 THIS FORMAT WILL BE DEPRECATED IN FAVOR OF EXPLICIT SYNTAX!!!
 """
 
+# ========== Automatic Parameterization of Functions ==========
+"""
+Mojo supports auto parameterization of functions. If a func arg type is a partially-bound
+type, the unbound params are automatically added as input params on the function.
+Take the follwing example:
+"""
+
+fn print_params(vec: SIMD[*_]):
+    print(vec.type)
+    print(vec.size)
+
+"""
+The pirnt_param func is auto parameterized. The vec arg takes an arg of type SIMD[*_], which is an unbound parametric type.
+Mojo treats the unbound params on vec as implicit params on the func.
+This is roughly equivalent to the following:
+"""
+fn print_params2[t: DType, s: Int](vec: SIMD[t, s]):
+    print(vec.type)
+    print(vec.size)
+
+"""
+When calling print_params2() you must pass a concrete SIMD type, that is, with all params specified,
+like SIMD[DType.float64, 4]. Mojo compiler infers the para values from the input arg.
+
+With manually parameterized funcs, you can access params by name. With auto parameterized funcs, you can access the
+params as attributes on the argument (e.g. vec.type & vec.size). You can however use this style everywhere.
+You can access the input params of a parameterized type as attributes on the type itself:
+"""
+fn on_type():
+    print(SIMD[DType.float32, 2].size)   # prints 2
+
+# Or as attributes on an INSTANCE of the type:
+fn on_instance():
+    var x = SIMD[DType.int32, 2](4, 8)
+    print(x.type)   # prints int32
+
+"""
+Can even use this syntax in the function's signature to define a function's args and return type based on an args params.
+E.g. A function that takes 2 SIMD vecs with the same type and size:
+"""
+fn interleave(v1: SIMD, v2: __type_of(v1)) -> SIMD[v1.type, v1.size*2]:
+    var result = SIMD[v1.type, v1.size*2]()
+    
+    for i in range(v1.size):
+        result[i*2] = SIMD[v1.type, 1](v1[i])
+        result[i*2+1] = SIMD[v1.type, 1](v2[i])
+    
+    return result
+
+"""
+The magic method __type_of(x) can be used if you just want to match the type of an arg.
+In the above case, it's more convenient than to write the equivalent SIMD[v1.type, v1.size].
+"""
+
 fn main():
     repeat[3]("Hello")
 
@@ -577,3 +631,12 @@ fn main():
     alias zz = MyType[_, _, _, _]
     # *_
     alias xxx = MyType["Hello, *_"]
+
+    # Auto Parameterization of Functions
+    var vv = SIMD[DType.float64, 4](1.0, 2.0, 3.0, 4.0)
+    print_params(vv)
+
+    var aaa = SIMD[DType.int16, 4](1, 2, 3, 4)
+    var bbb = SIMD[DType.int16, 4](0, 0, 0, 0)
+    var ccc = interleave(aaa, bbb)
+    print(ccc)
