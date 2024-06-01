@@ -498,10 +498,26 @@ You must specify a value for the parameter to use the type. Any deault value is 
 
 Partially-bound and unbound parametric types can be used in some contexts where the missing (unbound)
 params will be supplied later- Such as in aliases and auto-parameterized functions.
-
 """
+
 struct MyType[s: String, i: Int, i2: Int, b: Bool = True]:
     pass
+
+# ========== Omitted Parameters ==========
+"""
+You can also omit the _ for unbound parts of a Type:
+MyType["Hi there!]      # Partially-bound
+MyType                   # Unbound
+
+NOTE:
+In the above scenario, default values do get bound immediately! So:
+MyType["Hi there!]
+Is equivalent to:
+MyType["Hi there!", _, _, True]     # Uses default value for `b`
+
+NOTE:
+THIS FORMAT WILL BE DEPRECATED IN FAVOR OF EXPLICIT SYNTAX!!!
+"""
 
 fn main():
     repeat[3]("Hello")
