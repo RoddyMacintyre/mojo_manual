@@ -477,6 +477,32 @@ NOTE:
 Aliases also obey scope, so you can use local ALIASES.
 """
 
+# ========== Fully-bound, Partially-bound, and Unbound Types ==========
+"""
+A parametrric type with its params specified is said to be fully bound (all params bound to values).
+You can only instantiate a fully-bound type.
+
+Parametric types can be unbound or partially bound in some contexts. 
+E.g. alias a partially bound type to create a new type that requires fewer params.
+
+alias Bytes = SIMD[DType.uint8, _]
+var b = Bytes[8]()
+
+The underscore (_) is a placeholder for an unbound parameter. The new type Bytes is a SIMD type that requires only the size parameter.
+
+In main, the below struct is implemented as Fully bound, Partially bound, and Unbound types.
+
+NOTE: Parameter unpacking
+can use *_ to unbind an arbitrary number of positional params at the end of a param list.
+You must specify a value for the parameter to use the type. Any deault value is ignored.
+
+Partially-bound and unbound parametric types can be used in some contexts where the missing (unbound)
+params will be supplied later- Such as in aliases and auto-parameterized functions.
+
+"""
+struct MyType[s: String, i: Int, i2: Int, b: Bool = True]:
+    pass
+
 fn main():
     repeat[3]("Hello")
 
@@ -519,3 +545,19 @@ fn main():
     # Mojo Types are just Parameter Expressions
     var w = Array[Float32](4, 3.14)
     print(w[0], w[1], w[2], w[3])
+
+    # Fully-bound, partially-bound, and unbound types
+    # Below code breaks with the following error:
+    # error: type of index reference #kgen.param.index.ref<0, false, 0> : !lit.declref<@stdlib::@builtin::@dtype::@DType> 
+    # does not match parameter type '!lit.declref<@stdlib::@builtin::@int::@Int>'
+    # alias Bytes = SIMD[DType.uint8, _]
+    # var b = Bytes[8]()
+
+    # Fully bound
+    alias xx = MyType["Hello", 3, 4, True]
+    # Partially bound
+    alias yy = MyType["Hola", _, _, True]
+    # Unbound
+    alias zz = MyType[_, _, _, _]
+    # *_
+    alias xxx = MyType["Hello, *_"]
