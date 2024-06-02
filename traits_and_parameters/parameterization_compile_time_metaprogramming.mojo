@@ -573,6 +573,63 @@ The magic method __type_of(x) can be used if you just want to match the type of 
 In the above case, it's more convenient than to write the equivalent SIMD[v1.type, v1.size].
 """
 
+# ========== Automatic Parameterization with partially-bound types ==========
+"""
+E.g.suppose we have a Fudge struct with 3 params:
+"""
+
+@value
+struct Fudge[sugar: Int, cream: Int, chocolate: Int = 7](Stringable):
+    fn __str__(self) -> String:
+        var values = StaticIntTuple[3](sugar, cream, chocolate)
+        return str("Fudge") + values
+
+# We can then write a frunction that takes a Fudge arg with just one bound parameter (it's partially-bound):
+
+fn eat(f: Fudge[5, *_]):
+    print("Ate ", str(f))
+
+"""
+The eat() func takes a Fudge struct with the first param (sugar) bound to the value 5. The second and third
+params (cream & chocolate) are unbound.
+
+The unbound cream and chocolate params become implicit input params on the eat function. In practice,
+this is roughly equivalent to writing:
+"""
+
+fn eat1[cr: Int, ch: Int](f: Fudge[5, cr, ch]):
+    print("Ate " + str(f))
+
+"""
+You can also explicitly unbind individual params, giving more freedom in specifying unboud params.
+E.g. you might want to let the user specify values for sugar and chocolat, and leave the cream constant.
+To achieve this, replace each unbound parameter val with a single underscore (_):
+"""
+fn devour(f: Fudge[_, 6, _]):
+    print(str("Devourd ") + str(f))
+
+"""
+The sugar and chocolat params are added as implicit params on the function. This version is roughyl equivalent to the following func:
+"""
+fn devour1[su: Int, ch: Int](f: Fudge[su, 6, ch]):
+    print(str("Devoured ") + str(f))
+
+"""
+You can also specify params by keyword, or mixed pos & kw params. The below func is roughly equivalent to the above.
+Sugar is explicitly unbound with the _. The chocolate param is unbound using the keyword syntax chocolate=_, and 
+cream is explicitly bound to the value 6:
+"""
+fn devour2(f: Fudge[_, chocolate=_, cream=6]):
+    print(str("Devoured ") + str(f))
+
+"""
+All three versions of devour work with the following calls:
+
+devour(Fudge[3, 6, 9]())
+devour(Fudge[4, 6, 8]())
+"""
+
+
 fn main():
     repeat[3]("Hello")
 
@@ -640,3 +697,11 @@ fn main():
     var bbb = SIMD[DType.int16, 4](0, 0, 0, 0)
     var ccc = interleave(aaa, bbb)
     print(ccc)
+
+    # Automatic Parameterization with partially-bound types
+    # In both cases, we can call the eat1 function by passing in an instance with the cream and chocolate params bound.
+    eat1(Fudge[5, 5, 7]())
+    eat1(Fudge[5, 8, 9]())
+
+    # If you try to pass an arg with a sugar value other than 5, compilation fails because it doesn't match the arg type.
+    # eat1(Fudge[7, 5, 7]())
