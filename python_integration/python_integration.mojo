@@ -48,7 +48,29 @@ Both absolute and relative paths work with add_to_path().
 Full path works, but also the "." for current/local directory.
 """
 
-fn main() raises:   # NEed this because Python code often raises exceptions
+# ========== Call Mojo from Python ==========
+"""
+There's currently no way to call Mojo from Python. 
+This might present a challenge for certain modules, e.g. many UI frameworks have a main event loop
+that makes callbacks to to user-defined code in response to events.
+This is an inversion of control where the app call out to application code, instead of calling into a library.
+
+You simply cannot pass Mojo callbacks to a Python module.
+
+Consider Tkinter, the typical usage is something along the lines of:
+    - Create a main/root window
+    - Add UI widgets to the window (these can have associated callback functions)
+    - Start the main event loop, listening for events and invoking callback functions.
+
+Since Python cannot call back into Mojo, an alternative is to have Mojo drive the event loop and poll for updates.
+Consider the following example (see ui_py.py).
+
+We can call this Python module fro Mojo:
+"""
+fn button_clicked():
+    print("Hi from a Mojo🔥 fn!")
+
+fn main() raises:   # Need this because Python code often raises exceptions
     try:
         _ = use_array()
     except:
@@ -63,4 +85,15 @@ fn main() raises:   # NEed this because Python code often raises exceptions
     var values = mypython.gen_random_values(2, 3)
     print("The values are:")
     print(values)
+
+    # Call Mojo from Python
+    var app = Python.import_module("ui_py").App()
+    app.create("800x600")
+
+    # The Mojo event loop for the Python UI
+    while True:
+        app.update()
+        if app.clicked:
+            button_clicked()
+            app.clicked = False
 
