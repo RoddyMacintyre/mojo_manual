@@ -39,8 +39,28 @@ Mojo loads the Python interpreterr and Python modules at runtime, so wherever yo
 Python interpreter, and to locate any imported Python modules. For more information, see the Python environment.
 """
 
-fn main():
+# ========== Import Local Python Module ==========
+"""
+If you have local Python code you want to use in Mojo, add the directory tot he Python path and import the module.
+E.g. suppose you have a file "mypython.py", see main.
+
+Both absolute and relative paths work with add_to_path().
+Full path works, but also the "." for current/local directory.
+"""
+
+fn main() raises:   # NEed this because Python code often raises exceptions
     try:
         _ = use_array()
     except:
         print("Could not use Python's numpy module. Reason: ???")
+
+    # Import local Python Modules
+    from python import Python
+
+    Python.add_to_path(".") 
+    var mypython = Python.import_module("mypython")
+
+    var values = mypython.gen_random_values(2, 3)
+    print("The values are:")
+    print(values)
+
