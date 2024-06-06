@@ -70,6 +70,19 @@ We can call this Python module fro Mojo:
 fn button_clicked():
     print("Hi from a Mojo🔥 fn!")
 
+# ========== Python Environment ==========
+"""
+The Mojo SDK depends on an existing Python installation that includes a shared lib version of the Python interpreter.
+When installing Mojo, it looks for a compatible Python and sets up the sys.path to load matching modules.
+
+In most cases, this just works. If you, however, do run into problems, see the following sections.
+"""
+
+# ========== Installation Issues ==========
+"""
+
+"""
+
 fn main() raises:   # Need this because Python code often raises exceptions
     try:
         _ = use_array()
