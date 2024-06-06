@@ -80,7 +80,13 @@ In most cases, this just works. If you, however, do run into problems, see the f
 
 # ========== Installation Issues ==========
 """
+Mojo uses find_libpython to find a CPythopn shared library. This may fail with any of the following conditions:
+    - No Python installed, or unsupported version by Mojo
+    - No shared lib version of the CPython interpreter found (e.g. .so, .dylib). Some py dists
+      don't include shared libs, which prevents Mojo from embedding the interpreter.
 
+In all cases, install a compatible Python version, including shared libs.
+Try with the following link: https://docs.modular.com/mojo/manual/python/#set-up-a-python-environment-with-conda
 """
 
 fn main() raises:   # Need this because Python code often raises exceptions
