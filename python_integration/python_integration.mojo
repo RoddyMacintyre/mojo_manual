@@ -89,6 +89,37 @@ In all cases, install a compatible Python version, including shared libs.
 Try with the following link: https://docs.modular.com/mojo/manual/python/#set-up-a-python-environment-with-conda
 """
 
+# ========== Set up a Python Environment with Conda ==========
+"""
+Using a Py venv like Conda is a way to avoid problems with Mojo & Python. It provides a consistent Py env
+with a known version of Py, and all the packages you want to use with Mojo.
+
+Instructions to set up a venv with Conda:
+    1. Install Conda by following https://docs.conda.io/projects/miniconda/en/latest/#quick-command-line-install 
+       Make sure to initialize Conda for the shell or shells you use, e.g.:
+       ~/miniconda3/bin/conda init zsh
+       OR
+       ~/miniconda3/bin/conda init -all
+    2. Restart your shell
+    3. Run the following command (configures Mojo to use the Conda env):
+       "
+       export MOJO_PYTHON_LIBRARY="$(find $CONDA_PREFIX/lib -iname 'libpython*.[s,d]*' | sort -r | head -n 1)"
+       echo "export MOJO_PYTHON_LIBRARY=$MOJO_PYTHON_LIBRARY" >> ~/.zshrc
+       "
+       If you use another shell than zsh, adjust the command accordingly.
+    4. Try running the Mojo REPL:
+         "
+         mojo
+         "
+         If you see the Mojo prompt, you're good to go.
+
+After setting up the Conda venv, you can install any packages you want to use with Mojo using the "conda install" command.
+e.g. conda install numpy
+
+For more information on using Conda with Mojo, see the following blog entry:
+https://www.modular.com/blog/using-mojo-with-python
+"""
+
 fn main() raises:   # Need this because Python code often raises exceptions
     try:
         _ = use_array()
