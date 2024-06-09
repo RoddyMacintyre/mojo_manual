@@ -21,3 +21,24 @@ type_printer(("Mojo", True))    # tuple
 NOTE:
 This is a simplified example, and the bottom most code is top-level Mojo code.
 """
+
+# ========== Python Types in Mojo ==========
+"""
+Python objects can also be used in Mojo. If you would like heterogenous collections for Dict and List,
+Mojo doesn't support this (yet), but Python does.
+"""
+
+def use_dict():
+    from python import Python
+
+    var dictionary = Python.dict()
+    dictionary["name"] = "Mojo"
+    dictionary["age"] = 1
+    print(dictionary)
+
+fn main():
+    # Python Types in Mojo
+    try:
+        _ = use_dict()
+    except:
+        print("Python not installed")
